@@ -2,10 +2,16 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  
+  --foregroundColor: #F0F4EF;
+  --textColor: #131415;
+  --activeColor: #E05263;
+  --greenMuted: #6F9283;
+  --greenBright: #77ffdf;
 
   color-scheme: light;
-  color: #131415;
-  background-color: #F0F4EF;
+  color: var(--textColor);
+  background-color: var(--foregroundColor);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -25,8 +31,6 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }

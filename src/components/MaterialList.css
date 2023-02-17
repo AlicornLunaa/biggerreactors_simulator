@@ -1,0 +1,9 @@
+.materialBar {
+    padding: 2px;
+    padding-bottom: 1rem;
+}
+
+.materialBar button {
+    padding: 6px;
+    font-size: 1rem;
+}
