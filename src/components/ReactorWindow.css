@@ -1,3 +1,13 @@
 .reactor {
     max-height: 50rem;
 }
+
+.reactorElement {
+    aspect-ratio: 1 / 1;
+    background-color: rgb(49, 107, 8);
+    color: white;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

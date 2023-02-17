@@ -14,11 +14,11 @@ function MaterialList(props: MaterialListProps){
     useEffect(() => {
         let currentList: Material[] = Materials[(props.useOldMaterials ? 1 : 0)];
         let materialElements: JSX.Element[] = [];
+        let i = 0;
 
         for(let m of currentList){
-            materialElements.push(
-                <button onClick={() => { props.setMaterial(m) }}>{m.displayName}</button>
-            )
+            materialElements.push( <button key={i} onClick={() => { props.setMaterial(m) }}>{m.displayName}</button> )
+            i++;
         }
 
         setMaterialDivs(materialElements);
