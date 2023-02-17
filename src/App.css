@@ -41,3 +41,26 @@
 .title {
   font-size: 1.618rem;
 }
+
+.reactorSetup p {
+  display: flex;
+  justify-content: center;
+  font-size: 1.618rem;
+}
+
+.reactorSetupContent {
+  padding: 2px 1rem;
+}
+
+.reactorSetupActions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.reactorSetupActions button {
+  padding: 1rem;
+  margin: 0.2rem;
+  width: 100%;
+}

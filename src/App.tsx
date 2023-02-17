@@ -1,13 +1,14 @@
 import reactorLogo from './assets/reactorsim.svg'
 import './App.css'
 import ReactorWindow from './components/ReactorWindow'
-import { Grid } from '@mui/material'
+import { Dialog, Grid, TextField } from '@mui/material'
 import MaterialList from './components/MaterialList'
 import { useState } from 'react'
 import { Material } from './classes/Materials'
 
 function App() {
   const [material, setMaterial] = useState<Material | null>(null);
+  const [openReactorSetup, setOpenReactorSetup] = useState(false);
   const [useOldMaterial, setUseOldMaterial] = useState(false);
 
   return (
@@ -18,7 +19,7 @@ function App() {
           <div className="title">Reactor Simulator</div>
         </div>
         <div className="actions">
-          <button>New</button>
+          <button onClick={() => {setOpenReactorSetup(true)}}>New</button>
           <button>Save</button>
           <button>Load</button>
         </div>
@@ -31,8 +32,20 @@ function App() {
           <ReactorWindow material={material} />
         </Grid>
       </Grid>
+      
+      <Dialog className="reactorSetup" open={openReactorSetup} onClose={() => {setOpenReactorSetup(false)}}>
+        <p>Setup New Reactor</p>
+        <div className="reactorSetupContent">
+          <TextField autoFocus margin="dense" id="width" label="Width" type="number" variant="standard" />
+          <TextField autoFocus margin="dense" id="height" label="Height" type="number" variant="standard" />
+        </div>
+        <div className="reactorSetupActions">
+          <button onClick={() => setOpenReactorSetup(false)}>Cancel</button>
+          <button onClick={() => setOpenReactorSetup(false)}>New</button>
+        </div>
+      </Dialog>
     </div>
   )
 }
 
-export default App
+export default App;
