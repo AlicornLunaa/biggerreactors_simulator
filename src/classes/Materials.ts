@@ -18,7 +18,7 @@ class Material {
 
 const Materials = [
     [
-        new Material("astralsorcery:liquid_starlight", "Liquid Starlight", 0.85, 0.8, 2.0, 3.0),
+        new Material("biggerreactors:fuel_rod", "Fuel Rod", 0.0, 0.0, 0.0, 0.0),
         new Material("biggerreactors:ludicrite_block", "Ludicrite Block", 0.6, 0.87, 3, 3),
         new Material("bloodmagic:life_essence_block", "Life Essence Block", 0.7, 0.55, 1.75, 2.5),
         new Material("mekanism:ethene", "Ethene", 0.37, 0.65, 1.9, 1.5),
@@ -70,6 +70,7 @@ const Materials = [
         new Material("forge:superheated_sodium", "Superheated Sodium", 0.23, 0.6, 1.7, 1)
     ],
     [
+        new Material("biggerreactors:fuel_rod", "Fuel Rod", 0.0, 0.0, 0.0, 0.0),
         new Material("astralsorcery:liquid_starlight", "Liquid Starlight", 0.85, 0.8, 2.0, 3.0),
         new Material("biggerreactors:ludicrite_block", "Ludicrite Block", 0.6, 0.87, 3, 3),
         new Material("bloodmagic:life_essence_block", "Life Essence Block", 0.7, 0.55, 1.75, 2.5),
