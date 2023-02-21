@@ -17,7 +17,7 @@ abstract class BaseReactorSimulation {
 
     defaultModerator: Material;
     moderatorProperties: (Material | null)[][][] = [];
-    controlRodsXZ: ControlRod[][] = [];
+    controlRodsXZ: (ControlRod | null)[][] = [];
     controlRods: ControlRod[] = [];
 
     fuelToCasingRFKT: number;
@@ -41,13 +41,20 @@ abstract class BaseReactorSimulation {
         this.z = desc.z;
         this.defaultModerator = desc.defaultModeratorProperties;
 
+        this.controlRodsXZ = [];
         for(let i = 0; i < desc.x; i++){
             for(let j = 0; j < desc.z; j++){
+                let slice: (ControlRod | null)[] = [];
+
                 if(desc.controlRodLocations[i][j]){
                     let rod = new ControlRod(i, j);
-                    this.controlRodsXZ[i][j] = rod;
+                    slice.push(rod);
                     this.controlRods.push(rod);
+                } else {
+                    slice.push(null);
                 }
+
+                this.controlRodsXZ.push(slice);
             }
         }
 
@@ -61,14 +68,18 @@ abstract class BaseReactorSimulation {
             this.battery = null;
         }
         
+        this.moderatorProperties = [];
         for (let i = 0; i < desc.x; i++) {
+            let ySlice: (Material | null)[][] = [];
+
             for (let j = 0; j < desc.y; j++) {
+                let zSlice: (Material | null)[] = [];
+
                 for (let k = 0; k < desc.z; k++) {
                     let newProperties: Material | null = desc.moderatorProperties[i][j][k];
 
                     if (desc.manifoldLocations[i][j][k]) {
-                        // TODO: FIX
-                        // newProperties = this.coolantTank;
+                        newProperties = this.coolantTank!.moderator;
                     }
                     if (newProperties == null) {
                         newProperties = this.defaultModerator;
@@ -76,9 +87,14 @@ abstract class BaseReactorSimulation {
                     if (this.controlRodsXZ[i][k] != null) {
                         newProperties = null;
                     }
-                    this.moderatorProperties[i][j][k] = newProperties;
+
+                    zSlice.push(newProperties);
                 }
+
+                ySlice.push(zSlice);
             }
+
+            this.moderatorProperties.push(ySlice);
         }
     
         this.fuelTank = new FuelTank(Config.Reactor.PerFuelRodCapacity * this.controlRods.length * desc.y);
@@ -172,17 +188,15 @@ abstract class BaseReactorSimulation {
             this.fuelTank.burn(0);
         }
         
-        {
-            // decay fertility, RadiationHelper.tick in old BR, this is copied, mostly
-            let denominator = Config.Reactor.FuelFertilityDecayDenominator;
-            if (!active) {
-                // Much slower decay when off
-                denominator *= Config.Reactor.FuelFertilityDecayDenominatorInactiveMultiplier;
-            }
-            
-            // Fertility decay, at least 0.1 rad/t, otherwise halve it every 10 ticks
-            this.fuelFertility = Math.max(0, this.fuelFertility - Math.max(Config.Reactor.FuelFertilityMinimumDecay, this.fuelFertility / denominator));
+        // decay fertility, RadiationHelper.tick in old BR, this is copied, mostly
+        let denominator = Config.Reactor.FuelFertilityDecayDenominator;
+        if (!active) {
+            // Much slower decay when off
+            denominator *= Config.Reactor.FuelFertilityDecayDenominatorInactiveMultiplier;
         }
+        
+        // Fertility decay, at least 0.1 rad/t, otherwise halve it every 10 ticks
+        this.fuelFertility = Math.max(0, this.fuelFertility - Math.max(Config.Reactor.FuelFertilityMinimumDecay, this.fuelFertility / denominator));
         
         this.fuelHeat.transferWith(this.stackHeat, this.fuelToCasingRFKT + this.fuelToManifoldSurfaceArea * (this.coolantTank == null ? this.defaultModerator.conductivity : this.coolantTank.moderator!.conductivity));
         this.output.transferWith(this.stackHeat, this.stackToCoolantSystemRFKT);

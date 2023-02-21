@@ -67,6 +67,8 @@ export default class TimeSlicedReactorSimulation extends BaseReactorSimulation {
                 }
 
                 let properties = this.moderatorProperties[currentX][currentY][currentZ];
+                // console.log(properties);
+
                 if(properties != null){
                     let radiationAbsorbed = neutronIntensity * properties.absorption * (1 - neutronHardness) * rayStep.length;
                     neutronIntensity = Math.max(0, neutronIntensity - radiationAbsorbed);
@@ -75,7 +77,7 @@ export default class TimeSlicedReactorSimulation extends BaseReactorSimulation {
                 } else {
                     // Fuel rod
                     // Scale control rod insertion 0..1
-                    let controlRodInsertion = this.controlRodsXZ[currentX][currentZ].insertion * .001;
+                    let controlRodInsertion = this.controlRodsXZ[currentX][currentZ]!.insertion * .001;
                     
                     // Fuel absorptiveness is determined by control rod + a heat modifier.
                     // Starts at 1 and decays towards 0.05, reaching 0.6 at 1000 and just under 0.2 at 2000. Inflection point at about 500-600.

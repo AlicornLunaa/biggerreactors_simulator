@@ -2,36 +2,22 @@ import { Material } from "../Materials";
 
 class SimulationDescription {
 
-    x: number;
-    y: number;
-    z: number;
+    x: number = 0;
+    y: number = 0;
+    z: number = 0;
 
     defaultModeratorProperties: Material = Material.EMPTY_MODERATOR;
     moderatorProperties: Material[][][] = [];
     manifoldLocations: boolean[][][] = [];
-    manifoldCount: number;
+    manifoldCount: number = 0;
 
     controlRodLocations: boolean[][] = [];
-    controlRodCount: number;
+    controlRodCount: number = 0;
 
-    passivelyCooled: boolean;
-    ambientTemperature: number;
+    passivelyCooled: boolean = true;
+    ambientTemperature: number = 273.15;
 
-    constructor(){
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-
-        this.moderatorProperties = [];
-        this.manifoldLocations = [];
-        this.manifoldCount = 0;
-
-        this.controlRodLocations = [];
-        this.controlRodCount = 0;
-
-        this.passivelyCooled = false;
-        this.ambientTemperature = 273.15;
-    }
+    constructor(){}
     
     public setSize(x: number, y: number, z: number) {
         if (x <= 0 || y <= 0 || z <= 0) return;
@@ -39,6 +25,44 @@ class SimulationDescription {
         this.x = x;
         this.y = y;
         this.z = z;
+
+        this.moderatorProperties = [];
+        this.manifoldLocations = [];
+        this.manifoldCount = 0;
+
+        for(let i = 0; i < x; i++){
+            let ySliceModerators: Material[][] = [];
+            let ySliceManifolds: boolean[][] = [];
+
+            for(let j = 0; j < y; j++){
+                let zSliceModerators: Material[] = [];
+                let zSliceManifolds: boolean[] = [];
+
+                for(let k = 0; k < z; k++){
+                    zSliceModerators.push(this.defaultModeratorProperties);
+                    zSliceManifolds.push(false);
+                }
+
+                ySliceModerators.push(zSliceModerators);
+                ySliceManifolds.push(zSliceManifolds);
+            }
+
+            this.moderatorProperties.push(ySliceModerators)
+            this.manifoldLocations.push(ySliceManifolds)
+        }
+
+        this.controlRodLocations = [];
+        this.controlRodCount = 0;
+
+        for(let i = 0; i < x; i++){
+            let slice: boolean[] = [];
+
+            for(let k = 0; k < z; k++){
+                slice.push(false);
+            }
+
+            this.controlRodLocations.push(slice);
+        }
     }
     
     public setModeratorProperties(x: number, y: number, z: number, properties: Material) {
