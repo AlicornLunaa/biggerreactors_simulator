@@ -10,13 +10,13 @@ import { Material } from "../Materials";
 import SimulationDescription from "./SimulationDescription";
 import { AxisDirections, CardinalDirections } from "../Vector";
 
-class BaseReactorSimulation {
+abstract class BaseReactorSimulation {
     x: number;
     y: number;
     z: number;
 
-    defaultMaterial: Material;
-    moderators: (Material | null)[][][] = [];
+    defaultModerator: Material;
+    moderatorProperties: (Material | null)[][][] = [];
     controlRodsXZ: ControlRod[][] = [];
     controlRods: ControlRod[] = [];
 
@@ -35,19 +35,18 @@ class BaseReactorSimulation {
     fuelTank: FuelTank;
     fuelFertility: number = 1;
 
-    constructor(desc: SimulationDescription, defaultMaterial: Material){
+    constructor(desc: SimulationDescription){
         this.x = desc.x;
         this.y = desc.y;
         this.z = desc.z;
-        this.defaultMaterial = defaultMaterial;
+        this.defaultModerator = desc.defaultModeratorProperties;
 
-        let currentControlRodIndex = 0;
         for(let i = 0; i < desc.x; i++){
             for(let j = 0; j < desc.z; j++){
                 if(desc.controlRodLocations[i][j]){
                     let rod = new ControlRod(i, j);
                     this.controlRodsXZ[i][j] = rod;
-                    this.controlRods[currentControlRodIndex++];
+                    this.controlRods.push(rod);
                 }
             }
         }
@@ -58,26 +57,26 @@ class BaseReactorSimulation {
         } else {
             let perSideCapacity = this.controlRods.length * desc.y * Config.Reactor.CoolantTankAmountPerFuelRod;
             perSideCapacity += desc.manifoldCount * Config.Reactor.CoolantTankAmountPerFuelRod;
-            this.output = this.coolantTank = new CoolantTank(perSideCapacity, defaultMaterial);
+            this.output = this.coolantTank = new CoolantTank(perSideCapacity, desc.defaultModeratorProperties);
             this.battery = null;
         }
         
         for (let i = 0; i < desc.x; i++) {
             for (let j = 0; j < desc.y; j++) {
                 for (let k = 0; k < desc.z; k++) {
-                    let newProperties: Material | null = desc.moderators[i][j][k];
+                    let newProperties: Material | null = desc.moderatorProperties[i][j][k];
 
                     if (desc.manifoldLocations[i][j][k]) {
                         // TODO: FIX
                         // newProperties = this.coolantTank;
                     }
                     if (newProperties == null) {
-                        newProperties = defaultMaterial;
+                        newProperties = this.defaultModerator;
                     }
                     if (this.controlRodsXZ[i][k] != null) {
                         newProperties = null;
                     }
-                    this.moderators[i][j][k] = newProperties;
+                    this.moderatorProperties[i][j][k] = newProperties;
                 }
             }
         }
@@ -93,7 +92,7 @@ class BaseReactorSimulation {
                         fuelToCasingRFKT += Config.Reactor.CasingHeatTransferRFMKT;
                         continue;
                     }
-                    let properties = this.moderators[controlRod.x + direction.x][i][controlRod.y + direction.y];
+                    let properties = this.moderatorProperties[controlRod.x + direction.x][i][controlRod.y + direction.y];
                     if (properties != null) {
                         if (properties instanceof CoolantTank) {
                             fuelToManifoldSurfaceArea++;
@@ -113,7 +112,7 @@ class BaseReactorSimulation {
         for (let i = 0; i < this.x; i++) {
             for (let j = 0; j < this.y; j++) {
                 for (let k = 0; k < this.z; k++) {
-                    let properties = this.moderators[i][j][k];
+                    let properties = this.moderatorProperties[i][j][k];
                     if (properties instanceof CoolantTank) {
                         // its a manifold here, need to consider its surface area
                         for (let axisDirection of AxisDirections) {
@@ -127,7 +126,7 @@ class BaseReactorSimulation {
                                 stackToCoolantSystemRFKT--;
                                 continue;
                             }
-                            let neighborProperties = this.moderators[neighborX][neighborY][neighborZ];
+                            let neighborProperties = this.moderatorProperties[neighborX][neighborY][neighborZ];
                             // should a fuel rod add to surface area? it does right now.
                             if (!(neighborProperties instanceof CoolantTank)) {
                                 stackToCoolantSystemRFKT++;
@@ -161,13 +160,9 @@ class BaseReactorSimulation {
         }
     }
     
-    public radiate(){
-        return 0;
-    }
+    public abstract radiate(): number;
 
-    public startNextRadiate(){
-
-    }
+    public startNextRadiate(){}
 
     public tick(active: boolean) {
         let toBurn = 0;
@@ -189,7 +184,7 @@ class BaseReactorSimulation {
             this.fuelFertility = Math.max(0, this.fuelFertility - Math.max(Config.Reactor.FuelFertilityMinimumDecay, this.fuelFertility / denominator));
         }
         
-        this.fuelHeat.transferWith(this.stackHeat, this.fuelToCasingRFKT + this.fuelToManifoldSurfaceArea * (this.coolantTank == null ? this.defaultMaterial.conductivity : this.coolantTank.moderator.conductivity));
+        this.fuelHeat.transferWith(this.stackHeat, this.fuelToCasingRFKT + this.fuelToManifoldSurfaceArea * (this.coolantTank == null ? this.defaultModerator.conductivity : this.coolantTank.moderator!.conductivity));
         this.output.transferWith(this.stackHeat, this.stackToCoolantSystemRFKT);
         this.stackHeat.transferWith(this.ambientHeat, this.casingToAmbientRFKT);
         
@@ -197,6 +192,14 @@ class BaseReactorSimulation {
             this.startNextRadiate();
             this.fuelTank.burn(toBurn);
         }
+    }
+
+    public fertility(){
+        if(this.fuelFertility <= 1){
+            return 1;
+        }
+
+        return Math.log10(this.fuelFertility) + 1;
     }
 
 }

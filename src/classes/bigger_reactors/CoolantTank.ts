@@ -1,7 +1,7 @@
 // https://github.com/BiggerSeries/BiggerReactors/blob/master/src/main/java/net/roguelogix/biggerreactors/multiblocks/reactor/simulation/base/CoolantTank.java
 import Config from "./Config";
 import HeatBody from "./HeatBody";
-import { Material } from "./Materials";
+import { Material } from "../Materials";
 import { TransitionFluid } from "./TransitionFluid";
 
 class CoolantTank extends HeatBody {
@@ -10,7 +10,8 @@ class CoolantTank extends HeatBody {
     liquidAmount = 0;
     vaporAmount = 0;
 
-    moderator: Material;
+    defaultModerator: Material;
+    moderator: Material | null = null;
     transitionProperties: TransitionFluid | null = null;
     
     maxTransitionedLastTick: number = 0;
@@ -20,7 +21,7 @@ class CoolantTank extends HeatBody {
     constructor(perSideCapacity: number, moderator: Material) {
         super();
         this.perSideCapacity = perSideCapacity;
-        this.moderator = moderator;
+        this.defaultModerator = moderator;
         this.isInfinite = true;
     }
     
@@ -116,8 +117,8 @@ class CoolantTank extends HeatBody {
     }
     
     public absorption() {
-        if (this.perSideCapacity == 0) {
-            return this.moderator.absorption;
+        if (this.perSideCapacity == 0 || this.moderator == null) {
+            return this.defaultModerator.absorption;
         }
 
         let absorption = 0;
@@ -128,8 +129,8 @@ class CoolantTank extends HeatBody {
     }
     
     public heatEfficiency() {
-        if (this.perSideCapacity == 0) {
-            return this.moderator.efficiency;
+        if (this.perSideCapacity == 0 || this.moderator == null) {
+            return this.defaultModerator.efficiency;
         }
         let heatEfficiency = 0;
         heatEfficiency += this.moderator.efficiency * ((this.perSideCapacity) - (this.liquidAmount));
@@ -139,8 +140,8 @@ class CoolantTank extends HeatBody {
     }
     
     public moderation() {
-        if (this.perSideCapacity == 0) {
-            return this.moderator.moderation;
+        if (this.perSideCapacity == 0 || this.moderator == null) {
+            return this.defaultModerator.moderation;
         }
         let moderation = 0;
         moderation += this.moderator.moderation * ((this.perSideCapacity) - (this.liquidAmount));
@@ -150,8 +151,8 @@ class CoolantTank extends HeatBody {
     }
     
     public heatConductivity() {
-        if (this.perSideCapacity == 0) {
-            return this.moderator.conductivity;
+        if (this.perSideCapacity == 0 || this.moderator == null) {
+            return this.defaultModerator.conductivity;
         }
         let heatConductivity = 0;
         heatConductivity += this.moderator.conductivity * ((this.perSideCapacity) - (this.liquidAmount));

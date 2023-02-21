@@ -6,11 +6,12 @@ class SimulationDescription {
     y: number;
     z: number;
 
-    moderators: Material[][][];
-    manifoldLocations: boolean[][][];
+    defaultModeratorProperties: Material = Material.EMPTY_MODERATOR;
+    moderatorProperties: Material[][][] = [];
+    manifoldLocations: boolean[][][] = [];
     manifoldCount: number;
 
-    controlRodLocations: boolean[][];
+    controlRodLocations: boolean[][] = [];
     controlRodCount: number;
 
     passivelyCooled: boolean;
@@ -21,7 +22,7 @@ class SimulationDescription {
         this.y = 0;
         this.z = 0;
 
-        this.moderators = [];
+        this.moderatorProperties = [];
         this.manifoldLocations = [];
         this.manifoldCount = 0;
 
@@ -41,10 +42,10 @@ class SimulationDescription {
     }
     
     public setModeratorProperties(x: number, y: number, z: number, properties: Material) {
-        if (this.moderators == null) return;
-        if (x < 0 || x >= this.moderators.length || y < 0 || y >= this.moderators[0].length || z < 0 || z >= this.moderators[0][0].length) return;
+        if (this.moderatorProperties == null) return;
+        if (x < 0 || x >= this.moderatorProperties.length || y < 0 || y >= this.moderatorProperties[0].length || z < 0 || z >= this.moderatorProperties[0][0].length) return;
 
-        this.moderators[x][y][z] = properties;
+        this.moderatorProperties[x][y][z] = properties;
     }
     
     public setControlRod(x: number, z: number, isControlRod: boolean) {

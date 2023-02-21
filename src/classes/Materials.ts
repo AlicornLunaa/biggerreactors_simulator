@@ -1,4 +1,6 @@
 class Material {
+    static EMPTY_MODERATOR = new Material("empty", "empty", 0, 0, 0, 0);
+
     id: string;
     displayName: string;
     absorption: number;
