@@ -24,8 +24,8 @@ function App() {
         </div>
         <div className="actions">
           <button onClick={() => {setOpenReactorSetup(true)}}>New</button>
-          <button>Save</button>
-          <button>Load</button>
+          {/* <button>Save</button>
+          <button>Load</button> */}
         </div>
       </div>
       
@@ -46,7 +46,6 @@ function App() {
           <TextField className="reactorSetupInput" value={height} onChange={event => setHeight(Number(event.target.value))} margin="dense" id="height" label="Height" type="number" variant="standard" />
         </div>
         <div className="reactorSetupActions">
-          <button onClick={() => setOpenReactorSetup(false)}>Cancel</button>
           <button onClick={() => setOpenReactorSetup(false)}>Done</button>
         </div>
       </Dialog>

@@ -30,6 +30,10 @@ function ReactorWindow(props: ReactorWindowProps){
         setReactorMaterials(reactorMaterials => [...reactorMaterials]);
     }
 
+    const simulateReactor = () => {
+        
+    }
+
     useEffect(() => {
         let elements: JSX.Element[] = [];
         let count = 0;
