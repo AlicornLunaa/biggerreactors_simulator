@@ -19,6 +19,16 @@ class Vector3 {
         this.z = z;
     }
 
+    public setComponent(index: number, val: number){
+        if(index == 0){
+            this.x = val;
+        } else if(index == 1){
+            this.y = val;
+        } else {
+            this.z = val;
+        }
+    }
+
     public add(x: number, y: number, z: number){
         this.x += x;
         this.y += y;
@@ -52,7 +62,13 @@ class Vector3 {
     }
 
     public maxComponent(){
-        return Math.max(this.x, Math.max(this.y, this.z));
+        if(Math.abs(this.x) > Math.abs(this.y) && Math.abs(this.x) > Math.abs(this.z)){
+            return 0;
+        } else if(Math.abs(this.y) > Math.abs(this.z)){
+            return 1;
+        } else {
+            return 2;
+        }
     }
 
     public mul(val: number){

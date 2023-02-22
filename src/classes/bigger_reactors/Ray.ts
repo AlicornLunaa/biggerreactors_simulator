@@ -14,7 +14,6 @@ class RayStep {
 }
 
 {
-    // TODO: Create rays
     RayStep.rays = [];
     let TTL = Config.Reactor.IrradiationDistance;
     
@@ -38,7 +37,7 @@ class RayStep {
     let currentSegmentEnd = new Vector3(0, 0, 0);
     let currentSectionBlock = new Vector3(0, 0, 0);
     let planes = new Vector3(0, 0, 0);
-    let processedLength;
+    let processedLength = 0;
     
     let intersections: Vector3[] = [
             new Vector3(0, 0, 0),
@@ -57,7 +56,7 @@ class RayStep {
         // radiation extends for RadiationBlocksToLive from the outside of the fuel rod
         // but i rotate about the center of the fuel rod, so, i need to add the length of the inside
         currentSegmentStart.set(radiationDirection);
-        currentSegmentStart.mul(1 / Math.abs(currentSegmentStart.maxComponent()));
+        currentSegmentStart.mul(1 / Math.abs(currentSegmentStart.get(currentSegmentStart.maxComponent())));
         currentSegmentStart.mul(0.5);
         radiationDirection.mul(TTL + currentSegmentStart.length());
         
@@ -74,7 +73,8 @@ class RayStep {
         
         let firstIteration = true;
         let i = 0;
-        while (i < 5000) {
+
+        while (i < 500000) {
             i++;
 
             for (let i = 0; i < 3; i++) {
@@ -83,7 +83,7 @@ class RayStep {
                 let component = intersection.get(i);
                 let plane = planes.get(i);
                 intersection.mul(plane / component);
-            }
+            }   
             
             let minVec = 0;
             let minLength = Infinity;
@@ -96,16 +96,7 @@ class RayStep {
             }
             
             // move the plane we just intersected back one
-            if(planes.x < planes.y && planes.x < planes.z){
-                // X minimum
-                planes.x += (planes.x / Math.abs(planes.x));
-            } else if(planes.y < planes.z){
-                // Y minimum
-                planes.y += (planes.y / Math.abs(planes.y));
-            } else {
-                // Z minimum
-                planes.z += (planes.z / Math.abs(planes.z));
-            }
+            planes.setComponent(minVec, planes.get(minVec) + (planes.get(minVec) / Math.abs(planes.get(minVec))));
             
             currentSegmentEnd.set(intersections[minVec]);
             currentSegment.set(currentSegmentEnd).sub(currentSegmentStart);
@@ -115,6 +106,10 @@ class RayStep {
             let breakAfterLoop = processedLength + segmentLength >= totalLength;
             
             segmentLength = Math.min(totalLength - processedLength, segmentLength);
+
+            if(Number.isNaN(segmentLength)){
+                let a;
+            }
             
             if (!firstIteration && segmentLength != 0) {
                 raySteps.push(new RayStep(new Vector3(currentSectionBlock.x, currentSectionBlock.y, 0), segmentLength));

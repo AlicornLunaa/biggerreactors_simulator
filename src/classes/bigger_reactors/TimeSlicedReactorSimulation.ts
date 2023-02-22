@@ -67,13 +67,14 @@ export default class TimeSlicedReactorSimulation extends BaseReactorSimulation {
                 }
 
                 let properties = this.moderatorProperties[currentX][currentY][currentZ];
-                // console.log(properties);
 
                 if(properties != null){
                     let radiationAbsorbed = neutronIntensity * properties.absorption * (1 - neutronHardness) * rayStep.length;
                     neutronIntensity = Math.max(0, neutronIntensity - radiationAbsorbed);
                     neutronHardness = neutronHardness / (((properties.moderation - 1) * rayStep.length) + 1);
                     caseRFAdded += properties.efficiency * radiationAbsorbed * Config.Reactor.FEPerRadiationUnit;
+
+                    // TODO: Find NaN bug here
                 } else {
                     // Fuel rod
                     // Scale control rod insertion 0..1
