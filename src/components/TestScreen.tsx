@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { Checkbox } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import SimulationDescription from "../classes/bigger_reactors/SimulationDescription";
 import TimeSlicedReactorSimulation from "../classes/bigger_reactors/TimeSlicedReactorSimulation";
 import { Materials } from "../classes/Materials";
 
 export default function TestScreen(){
-    const [reactor, setReactor] = useState<TimeSlicedReactorSimulation>();
-    const [active, setActive] = useState(false);
+    const reactor = useRef<TimeSlicedReactorSimulation>();
+    const active = useRef(true);
     const [update, setUpdate] = useState(false);
 
     useEffect(() => {
@@ -20,11 +21,11 @@ export default function TestScreen(){
         desc.setModeratorProperties(0, 0, 2, Materials[0][12]);
         desc.setModeratorProperties(1, 0, 2, Materials[0][12]);
         desc.setModeratorProperties(2, 0, 2, Materials[0][12]);
-        setReactor(new TimeSlicedReactorSimulation(desc));
+        reactor.current = new TimeSlicedReactorSimulation(desc);
 
         const tickInterval = setInterval(() => {
-            if(reactor == null) return;
-            reactor.tick(true);
+            if(reactor.current == null) return;
+            reactor.current.tick(active.current);
             setUpdate(true);
         }, 50);
 
@@ -35,23 +36,19 @@ export default function TestScreen(){
 
     useEffect(() => { setUpdate(false); }, [update])
 
-    if(reactor == null) return (<div>Null reactor</div>);
+    if(reactor.current == null) return (<div>Null reactor</div>);
 
     return (
         <div>
-            <p>{reactor.x}x{reactor.y}x{reactor.z}</p>
-            <p>Fuel: {reactor.fuelTank!.fuel}/{reactor.fuelTank!.capacity}</p>
-            <p>Battery: {reactor.battery!.stored}/{reactor.battery!.capacity}</p>
+            <p>{reactor.current.x}x{reactor.current.y}x{reactor.current.z}</p>
+            <p>Fuel: {Math.round(reactor.current.fuelTank!.fuel)}/{Math.round(reactor.current.fuelTank!.capacity)}</p>
+            <p>Battery: {Math.round(reactor.current.battery!.stored)}/{Math.round(reactor.current.battery!.capacity)}</p>
             <button onClick={() => {
-                if(reactor == null) return;
-                reactor.tick(true);
-                setUpdate(true);
-            }}>Tick</button>
-            <button onClick={() => {
-                if(reactor == null) return;
-                reactor.fuelTank.fuel = reactor.fuelTank.capacity;
+                if(reactor.current == null) return;
+                reactor.current.fuelTank.fuel = reactor.current.fuelTank.capacity;
                 setUpdate(true);
             }}>Refuel</button>
+            <Checkbox onChange={(selected) => { active.current = selected.target.checked; }} />
         </div>
     )
 }
