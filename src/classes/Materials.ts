@@ -1,5 +1,5 @@
 class Material {
-    static EMPTY_MODERATOR = new Material("empty", "empty", 0, 0, 0, 0);
+    static EMPTY_MODERATOR = new Material("empty", "empty", 0, 0, 1, 0);
 
     id: string;
     displayName: string;

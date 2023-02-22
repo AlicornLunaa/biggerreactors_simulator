@@ -48,6 +48,9 @@ export default class TimeSlicedReactorSimulation extends BaseReactorSimulation {
         let effectiveRawRadIntensity = (rawRadIntensity * controlRodModifier);
         let iniitalIntensity = effectiveRadIntensity * rawIntensity;
 
+        rawFuelUsage += (Config.Reactor.FuelPerRadiationUnit * effectiveRawRadIntensity / this.fertility()) * Config.Reactor.FuelUsageMultiplier;
+        fuelRFAdded += Config.Reactor.FEPerRadiationUnit * iniitalIntensity;
+
         let rayMultiplier = 1 / RayStep.rays.length;
         for(let j = 0; j < RayStep.rays.length; j++){
             let raySteps = RayStep.rays[j];
@@ -73,8 +76,6 @@ export default class TimeSlicedReactorSimulation extends BaseReactorSimulation {
                     neutronIntensity = Math.max(0, neutronIntensity - radiationAbsorbed);
                     neutronHardness = neutronHardness / (((properties.moderation - 1) * rayStep.length) + 1);
                     caseRFAdded += properties.efficiency * radiationAbsorbed * Config.Reactor.FEPerRadiationUnit;
-
-                    // TODO: Find NaN bug here
                 } else {
                     // Fuel rod
                     // Scale control rod insertion 0..1

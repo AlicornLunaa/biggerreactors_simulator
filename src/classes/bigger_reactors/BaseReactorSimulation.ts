@@ -6,7 +6,7 @@ import ControlRod from "./ControlRod";
 import CoolantTank from "./CoolantTank";
 import FuelTank from "./FuelTank";
 import HeatBody from "./HeatBody";
-import { Material } from "../Materials";
+import { Material, Materials } from "../Materials";
 import SimulationDescription from "./SimulationDescription";
 import { AxisDirections, CardinalDirections } from "../Vector";
 
@@ -41,23 +41,6 @@ abstract class BaseReactorSimulation {
         this.z = desc.z;
         this.defaultModerator = desc.defaultModeratorProperties;
 
-        this.controlRodsXZ = [];
-        for(let i = 0; i < desc.x; i++){
-            for(let j = 0; j < desc.z; j++){
-                let slice: (ControlRod | null)[] = [];
-
-                if(desc.controlRodLocations[i][j]){
-                    let rod = new ControlRod(i, j);
-                    slice.push(rod);
-                    this.controlRods.push(rod);
-                } else {
-                    slice.push(null);
-                }
-
-                this.controlRodsXZ.push(slice);
-            }
-        }
-
         if (desc.passivelyCooled) {
             this.output = this.battery = new Battery((((desc.x + 2) * (desc.y + 2) * (desc.z + 2)) - (desc.x * desc.y * desc.z)) * Config.Reactor.PassiveBatteryPerExternalBlock);
             this.coolantTank = null;
@@ -84,9 +67,6 @@ abstract class BaseReactorSimulation {
                     if (newProperties == null) {
                         newProperties = this.defaultModerator;
                     }
-                    if (this.controlRodsXZ[i][k] != null) {
-                        newProperties = null;
-                    }
 
                     zSlice.push(newProperties);
                 }
@@ -95,6 +75,28 @@ abstract class BaseReactorSimulation {
             }
 
             this.moderatorProperties.push(ySlice);
+        }
+
+        this.controlRodsXZ = [];
+        for(let i = 0; i < desc.x; i++){
+            let slice: (ControlRod | null)[] = [];
+            
+            for(let j = 0; j < desc.z; j++){
+
+                if(desc.controlRodLocations[i][j]){
+                    let rod = new ControlRod(i, j);
+                    slice.push(rod);
+                    this.controlRods.push(rod);
+
+                    for(let k = 0; k < desc.y; k++){
+                        this.moderatorProperties[i][k][j] = null;
+                    }
+                } else {
+                    slice.push(null);
+                }
+            }
+
+            this.controlRodsXZ.push(slice);
         }
     
         this.fuelTank = new FuelTank(Config.Reactor.PerFuelRodCapacity * this.controlRods.length * desc.y);
