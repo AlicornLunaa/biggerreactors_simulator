@@ -4,8 +4,9 @@ import TimeSlicedReactorSimulation from "../classes/bigger_reactors/TimeSlicedRe
 import { Materials } from "../classes/Materials";
 
 export default function TestScreen(){
-    let [reactor, setReactor] = useState<TimeSlicedReactorSimulation>();
-    let [update, setUpdate] = useState(false);
+    const [reactor, setReactor] = useState<TimeSlicedReactorSimulation>();
+    const [active, setActive] = useState(false);
+    const [update, setUpdate] = useState(false);
 
     useEffect(() => {
         let desc = new SimulationDescription();
@@ -20,6 +21,16 @@ export default function TestScreen(){
         desc.setModeratorProperties(1, 0, 2, Materials[0][12]);
         desc.setModeratorProperties(2, 0, 2, Materials[0][12]);
         setReactor(new TimeSlicedReactorSimulation(desc));
+
+        const tickInterval = setInterval(() => {
+            if(reactor == null) return;
+            reactor.tick(true);
+            setUpdate(true);
+        }, 50);
+
+        return () => {
+            clearInterval(tickInterval);
+        };
     }, []);
 
     useEffect(() => { setUpdate(false); }, [update])
