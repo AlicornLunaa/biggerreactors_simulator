@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "homepage": "https://alicornlunaa.github.io/reactor_simulator",
+  "homepage": "https://alicornlunaa.github.io/biggerreactors_simulator",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
