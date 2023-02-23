@@ -1,6 +1,10 @@
 import { Grid } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import SimulationDescription from "../classes/bigger_reactors/SimulationDescription";
+import TimeSlicedReactorSimulation from "../classes/bigger_reactors/TimeSlicedReactorSimulation";
 import { Material, Materials } from "../classes/Materials";
+import ControlPanel from "./ControlPanel";
+import ControlRodPanel from "./ControlRodPanel";
 import "./ReactorWindow.css"
 
 interface ReactorWindowProps {
@@ -11,8 +15,13 @@ interface ReactorWindowProps {
 }
 
 function ReactorWindow(props: ReactorWindowProps){
+    const [update, setUpdate] = useState(false);
     const [reactorMaterials, setReactorMaterials] = useState<Material[]>([])
     const [reactorElements, setReactorElements] = useState<JSX.Element[]>([]);
+
+    const reactorDesc = useRef<SimulationDescription>(new SimulationDescription());
+    const active = useRef<boolean>(false);
+    const reactor = useRef<TimeSlicedReactorSimulation | null>(null);
 
     const searchMaterial = (id: string) => {
         for(let m of Materials[0]){
@@ -28,10 +37,6 @@ function ReactorWindow(props: ReactorWindowProps){
         if(m == null) return;
         reactorMaterials[id] = m;
         setReactorMaterials(reactorMaterials => [...reactorMaterials]);
-    }
-
-    const simulateReactor = () => {
-        
     }
 
     useEffect(() => {
@@ -68,6 +73,25 @@ function ReactorWindow(props: ReactorWindowProps){
         }
 
         setReactorElements(elements);
+
+        // Create sim
+        for(let i = 0; i < reactorMaterials.length; i++){
+            let x = i % props.width;
+            let z = Math.floor(i / props.width);
+
+            if(reactorMaterials[i].id == "biggerreactors:fuel_rod"){
+                // Yummy fun rods
+                reactorDesc.current.setControlRod(x, z, true);
+                continue;
+            }
+            
+            reactorDesc.current.setControlRod(x, z, false);
+
+            for(let h = 0; h < props.height; h++){
+                reactorDesc.current.setModeratorProperties(x, h, z, reactorMaterials[i]);
+            }
+        }
+        reactor.current = new TimeSlicedReactorSimulation(reactorDesc.current);
     }, [reactorMaterials, props.material]);
     
     useEffect(() => {
@@ -81,8 +105,25 @@ function ReactorWindow(props: ReactorWindowProps){
         }
 
         setReactorMaterials(materials);
-    }, [props.width, props.depth]);
 
+        reactorDesc.current.setSize(props.width, props.height, props.depth);
+        reactor.current = new TimeSlicedReactorSimulation(reactorDesc.current);
+    }, [props.width, props.depth, props.height]);
+
+    useEffect(() => {
+        const tickInterval = setInterval(() => {
+            if(reactor.current == null) return;
+            reactor.current.tick(active.current);
+            setUpdate(true);
+        }, 50);
+
+        return () => {
+            clearInterval(tickInterval);
+        };
+    }, []);
+
+    useEffect(() => { setUpdate(false); }, [update])
+    
     return (
         <div className="reactor">
             <Grid container spacing={0.14} columns={{ xs: props.width + 2 }}>
@@ -90,6 +131,8 @@ function ReactorWindow(props: ReactorWindowProps){
             </Grid>
             <p>{props.width}x{props.depth}x{props.height}</p>
             <p>{props.material?.displayName}</p>
+            <ControlPanel reactor={reactor} active={active} update={update} />
+            <ControlRodPanel reactor={reactor} />
         </div>
     );
 }
