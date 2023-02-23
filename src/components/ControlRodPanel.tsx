@@ -43,7 +43,7 @@ export default function ControlRodPanel(props: ControlRodPanelProps){
                 <Checkbox checked={locked} onChange={() => { setLocked(!locked); }} /><span>Lock sliders together</span>
                 {rodValues.map((insertion, i) => {
                     return (<div key={i} className="rod">
-                        <p>Rod {i}: {insertion}</p>
+                        <p>Rod {i + 1}: {insertion}</p>
                         <Slider value={insertion} onChange={(e, val) => {
                             if(locked){
                                 let rodList = props.reactor.current == null ? [] : props.reactor.current.controlRods;

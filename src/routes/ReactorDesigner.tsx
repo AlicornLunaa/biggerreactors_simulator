@@ -6,6 +6,7 @@ import ReactorWindow from '../components/ReactorWindow'
 import MaterialList from '../components/MaterialList'
 
 import reactorLogo from '../assets/reactorsim.svg'
+import { Link } from 'react-router-dom'
 
 function ReactorDesigner() {
   const [material, setMaterial] = useState<Material | null>(null);
@@ -24,6 +25,7 @@ function ReactorDesigner() {
           <div className="title">Reactor Simulator</div>
         </div>
         <div className="actions">
+          <Link className="buttonLink" to="/About">About</Link>
           <button onClick={() => {setOpenReactorSetup(true)}}>New</button>
           {/* <button>Save</button>
           <button>Load</button> */}
