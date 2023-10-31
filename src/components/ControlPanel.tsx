@@ -39,6 +39,8 @@ export default function ControlPanel(props: ControlPanelProps){
                 <div className="stat">Temperature: {round(props.reactor.current.fuelHeat.temperature, 1)} K</div>
                 <div className="stat">Generation: {rfGenerated} {rfUnit}</div>
                 <div className="stat">Fuel Usage: {round(props.reactor.current.fuelTank.burnedLastTick, 1000)} mB/t</div>
+                <div className="stat">RF per fuel: {props.reactor.current.fuelTank.burnedLastTick == 0 ? 0 : round(rfGenerated / props.reactor.current.fuelTank.burnedLastTick, 1000)} RF/mB/t</div>
+                <div className="stat">Reactivity: {round(props.reactor.current.fertility() * 100, 10)}%</div>
                 <div className="stat">Fuel: {Math.round(props.reactor.current.fuelTank!.fuel)}/{Math.round(props.reactor.current.fuelTank!.capacity)}</div>
                 <div className="stat">Waste: {Math.round(props.reactor.current.fuelTank!.waste)}/{Math.round(props.reactor.current.fuelTank!.capacity)}</div>
                 <div className="stat">Battery: {Math.round(props.reactor.current.battery!.stored)}/{Math.round(props.reactor.current.battery!.capacity)}</div>
