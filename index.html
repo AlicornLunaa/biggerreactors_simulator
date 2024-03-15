@@ -16,7 +16,7 @@
         </div>
         <div class="actions">
           <a href="about.html">About</a>
-          <button class="new-reactor-btn">New</button>
+          <button id="new-reactor-btn">New</button>
         </div>
       </div>
 
@@ -25,10 +25,9 @@
         <div class="reactor-window"></div>
       </div>
 
-      <div class="reactor-setup" style="visibility: hidden;">
-        <p>Setup New Reactor</p>
-
-        <div class="reactor-setup-content">
+      <div id="reactor-modal" class="modal">
+        <div id="reactor-setup" class="modal-content">
+          <p>Setup New Reactor</p>
           <input type="text" id="reactor-width-txt" />
           <input type="text" id="reactor-depth-txt" />
           <input type="text" id="reactor-height-txt" />

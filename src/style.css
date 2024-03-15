@@ -41,6 +41,15 @@
   align-items: center;
   justify-content: left;
 }
+.logo {
+  height: 4em;
+  margin-right: 1rem;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.title {
+  font-size: 1.618rem;
+}
 
 .actions {
   width: 100%;
@@ -48,56 +57,89 @@
   align-items: center;
   justify-content: right;
 }
-.actions button {
-  background-color: #EFEFEF;
-  color: black;
-  text-decoration: none;
+.actions button,
+.actions a {
+  border-radius: 8px;
+  border: 1px solid black;
   padding: 18px;
   margin: 0px 3px;
   font-size: 1rem;
-  border: 1px solid black;
+  font-weight: 500;
+  font-family: inherit;
+  text-decoration: none;
+  color: black;
+  background-color: #EFEFEF;
+  cursor: pointer;
+  transition: border-color 0.25s;
 }
-.actions button:hover {
+.actions button:hover,
+.actions a:hover {
   background-color: #E5E5E5;
   color: black;
 }
-.actions button:active {
+.actions button:active,
+.actions a:active {
   background-color: #F5F5F5;
   color: black;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  padding-top: 120px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: #000000;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 40%;
 }
 
-.title {
-  font-size: 1.618rem;
+#reactor-setup {
+  min-width: 320px;
+  width: 40%;
+  padding: 2px 1rem;
+  border-radius: 10px;
 }
-
-.reactor-setup p {
+#reactor-setup p {
   display: flex;
   justify-content: center;
   font-size: 1.618rem;
 }
-.reactor-setup-content {
-  padding: 2px 1rem;
-}
-.reactor-setup-actions {
-  width: 100%;
+#reactor-setup input {
+  width: 98%;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  font-weight: 400;
+  font-family: inherit;
+  text-decoration: none;
 }
-.reactor-setup-actions button {
-  width: 100%;
+#reactor-setup button {
+  border-radius: 8px;
+  border: 1px solid black;
   padding: 1rem;
   margin: 0.2rem;
-}
-.reactor-setup-input {
-  width: 9.708rem;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  text-decoration: none;
+  color: black;
+  background-color: #EFEFEF;
+  cursor: pointer;
+  transition: border-color 0.25s;
 }
 
 a {

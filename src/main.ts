@@ -11,3 +11,15 @@ import './style.css'
 //     </p>
 //   </div>
 // `
+
+let newBtn = document.querySelector<HTMLButtonElement>("#new-reactor-btn")!;
+let modalWindow = document.querySelector<HTMLButtonElement>("#reactor-modal")!;
+newBtn.addEventListener("click", () => {
+  modalWindow.style.display = "block";
+});
+
+window.onclick = function(event) {
+  if (event.target == modalWindow) {
+    modalWindow.style.display = "none";
+  }
+}
