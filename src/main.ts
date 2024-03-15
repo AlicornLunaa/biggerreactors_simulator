@@ -1,3 +1,4 @@
+import GenericReactor from './simulation/GenericReactor';
 import { Materials } from './simulation/Materials';
 import './style.css'
 
@@ -7,9 +8,7 @@ const REACTOR_ELEMENT_COLOR = "#316B1F";
 const REACTOR_ELEMENT_HOVER_COLOR = "#4FAE0B";
 const REACTOR_ELEMENT_ACTIVE_COLOR = "#46A701";
 
-let reactorWidth = 3;
-let reactorDepth = 3;
-let reactorHeight = 3;
+let reactor = new GenericReactor();
 
 let mouseX = 0;
 let mouseY = 0;
@@ -25,18 +24,18 @@ let depthInput = document.querySelector<HTMLInputElement>("#reactor-depth-txt")!
 let heightInput = document.querySelector<HTMLInputElement>("#reactor-height-txt")!;
 newBtn.addEventListener("click", () => {
   modalWindow.style.display = "block";
-  widthInput.value = `${reactorWidth}`;
-  depthInput.value = `${reactorDepth}`;
-  heightInput.value = `${reactorHeight}`;
+  widthInput.value = `${reactor.width}`;
+  depthInput.value = `${reactor.depth}`;
+  heightInput.value = `${reactor.height}`;
 });
 window.onclick = function(event) {
   if (event.target == modalWindow) {
     modalWindow.style.display = "none";
   }
 };
-widthInput.addEventListener("change", () => reactorWidth = Number.parseInt(widthInput.value));
-depthInput.addEventListener("change", () => reactorDepth = Number.parseInt(depthInput.value));
-heightInput.addEventListener("change", () => reactorHeight = Number.parseInt(heightInput.value));
+widthInput.addEventListener("change", () => reactor.width = Number.parseInt(widthInput.value));
+depthInput.addEventListener("change", () => reactor.depth = Number.parseInt(depthInput.value));
+heightInput.addEventListener("change", () => reactor.height = Number.parseInt(heightInput.value));
 
 // Populate element list
 let elementsDiv = document.querySelector<HTMLDivElement>(".material-list")!;
@@ -55,6 +54,7 @@ for(const mat of Materials[0]){
 
 // Create canvas
 let reactorCanvas = document.querySelector<HTMLCanvasElement>("#reactor-canvas")!;
+reactorCanvas.style.aspectRatio = (reactor.width / reactor.height).toString();
 reactorCanvas.width = reactorCanvas.offsetWidth;
 reactorCanvas.height = reactorCanvas.offsetHeight;
 let ctx = reactorCanvas.getContext("2d")!;
@@ -63,9 +63,9 @@ const get_mouse_pos = (ev: MouseEvent) => { x:return { x: ev.clientX - reactorCa
 const draw_canvas = () => {
   ctx.clearRect(0, 0, reactorCanvas.width, reactorCanvas.height);
 
-  for(let i = 0; i < reactorWidth + 2; i++) for(let k = 0; k < reactorWidth + 2; k++){
-    let cellWidth = reactorCanvas.width / (reactorWidth + 2);
-    let cellHeight = reactorCanvas.height / (reactorHeight + 2);
+  for(let i = 0; i < reactor.width + 2; i++) for(let k = 0; k < reactor.height + 2; k++){
+    let cellWidth = reactorCanvas.width / (reactor.width + 2);
+    let cellHeight = reactorCanvas.height / (reactor.height + 2);
     let cellGap = 3;
     
     let cellX = cellWidth * i + cellGap;
@@ -75,7 +75,7 @@ const draw_canvas = () => {
 
     ctx.fillStyle = REACTOR_ELEMENT_COLOR;
 
-    if(i == 0 || i == reactorWidth + 1 || k == 0 || k == reactorWidth + 1){
+    if(i == 0 || i == reactor.width + 1 || k == 0 || k == reactor.height + 1){
       ctx.fillStyle = REACTOR_WALL_COLOR;
       ctx.fillRect(cellX, cellY, cellW, cellH);
       continue;
@@ -96,6 +96,7 @@ const draw_canvas = () => {
 draw_canvas();
 
 window.addEventListener("resize", () => {
+  reactorCanvas.style.aspectRatio = (reactor.width / reactor.height).toString();
   reactorCanvas.width = reactorCanvas.offsetWidth;
   reactorCanvas.height = reactorCanvas.offsetHeight;
   draw_canvas();
@@ -105,8 +106,8 @@ reactorCanvas.addEventListener("mousemove", (ev) => {
   let pos = get_mouse_pos(ev);
   mouseX = pos.x;
   mouseY = pos.y;
-  selectedI = Math.floor(mouseX / (reactorCanvas.width / (reactorWidth + 2)));
-  selectedK = Math.floor(mouseY / (reactorCanvas.height / (reactorHeight + 2)));
+  selectedI = Math.floor(mouseX / (reactorCanvas.width / (reactor.width + 2)));
+  selectedK = Math.floor(mouseY / (reactorCanvas.height / (reactor.height + 2)));
   draw_canvas();
 });
 
@@ -114,8 +115,8 @@ reactorCanvas.addEventListener("mousedown", (ev) => {
   let pos = get_mouse_pos(ev);
   mouseX = pos.x;
   mouseY = pos.y;
-  selectedI = Math.floor(mouseX / (reactorCanvas.width / (reactorWidth + 2)));
-  selectedK = Math.floor(mouseY / (reactorCanvas.height / (reactorHeight + 2)));
+  selectedI = Math.floor(mouseX / (reactorCanvas.width / (reactor.width + 2)));
+  selectedK = Math.floor(mouseY / (reactorCanvas.height / (reactor.height + 2)));
   clicking = true;
   draw_canvas();
 });
@@ -124,8 +125,8 @@ reactorCanvas.addEventListener("mouseup", (ev) => {
   let pos = get_mouse_pos(ev);
   mouseX = pos.x;
   mouseY = pos.y;
-  selectedI = Math.floor(mouseX / (reactorCanvas.width / (reactorWidth + 2)));
-  selectedK = Math.floor(mouseY / (reactorCanvas.height / (reactorHeight + 2)));
+  selectedI = Math.floor(mouseX / (reactorCanvas.width / (reactor.width + 2)));
+  selectedK = Math.floor(mouseY / (reactorCanvas.height / (reactor.height + 2)));
   clicking = false;
   draw_canvas();
 });

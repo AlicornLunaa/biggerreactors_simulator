@@ -115,7 +115,8 @@
   justify-content: center;
   font-size: 1.618rem;
 }
-#reactor-setup input {
+#reactor-setup input,
+#reactor-setup select {
   width: 98%;
   display: flex;
   align-items: center;

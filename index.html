@@ -27,10 +27,22 @@
 
       <div id="reactor-modal" class="modal">
         <div id="reactor-setup" class="modal-content">
-          <p>Setup New Reactor</p>
+          <p>Reactor Config</p>
+
+          <div class="labeled-field">
+            <span>Version: </span>
+            <select id="reactor-version-txt">
+              <option value="1.20" selected="selected">1.20</option>
+              <option value="1.19">1.19</option>
+              <option value="1.18">1.18</option>
+              <option value="1.17">1.17</option>
+            </select>
+          </div>
+
           <div class="labeled-field"><span>Width: </span><input type="number" id="reactor-width-txt" min="1" onkeydown="javascript: return ['Backspace','Delete','ArrowLeft','ArrowRight','Tab'].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=='Space'" required /></div>
           <div class="labeled-field"><span>Depth: </span><input type="number" id="reactor-depth-txt" min="1" onkeydown="javascript: return ['Backspace','Delete','ArrowLeft','ArrowRight','Tab'].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=='Space'" required /></div>
           <div class="labeled-field"><span>Height: </span><input type="number" id="reactor-height-txt" min="1" onkeydown="javascript: return ['Backspace','Delete','ArrowLeft','ArrowRight','Tab'].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=='Space'" required /></div>
+
           <button id="reactor-submit-btn">Done</button>
         </div>
       </div>
