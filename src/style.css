@@ -141,6 +141,14 @@
   cursor: pointer;
   transition: border-color 0.25s;
 }
+.labeled-field {
+  display: flex;
+  justify-content: space-between;
+}
+.labeled-field span {
+  float: left;
+  padding-right: 1rem;
+}
 
 .grid {
   margin: 0 auto;
