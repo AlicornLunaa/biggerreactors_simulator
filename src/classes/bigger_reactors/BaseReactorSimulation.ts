@@ -6,7 +6,7 @@ import ControlRod from "./ControlRod";
 import CoolantTank from "./CoolantTank";
 import FuelTank from "./FuelTank";
 import HeatBody from "./HeatBody";
-import { Material, Materials } from "../Materials";
+import { Material } from "../Materials";
 import SimulationDescription from "./SimulationDescription";
 import { AxisDirections, CardinalDirections } from "../Vector";
 

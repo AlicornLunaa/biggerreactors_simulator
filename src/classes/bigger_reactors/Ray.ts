@@ -108,7 +108,7 @@ class RayStep {
             segmentLength = Math.min(totalLength - processedLength, segmentLength);
 
             if(Number.isNaN(segmentLength)){
-                let a;
+                // let a;
             }
             
             if (!firstIteration && segmentLength != 0) {
