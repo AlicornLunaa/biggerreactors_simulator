@@ -7,6 +7,7 @@ import { Material } from "./Materials";
  */
 export default class GenericReactor {
     // Variables
+    version: string;
     width: number;
     depth: number;
     height: number;
@@ -14,6 +15,7 @@ export default class GenericReactor {
 
     // Constructor
     constructor(){
+        this.version = "1.20"
         this.width = 3;
         this.depth = 3;
         this.height = 3;
@@ -21,13 +23,14 @@ export default class GenericReactor {
     }
     
     // Functions
-
+    public clear(){}
 
     // JSON Interface
     public static parse(data: string): GenericReactor {
         let plainInterface = JSON.parse(data) as GenericReactor;
         let reactor = new GenericReactor();
 
+        reactor.version = plainInterface.version;
         reactor.width = plainInterface.width;
         reactor.depth = plainInterface.depth;
         reactor.height = plainInterface.height;
