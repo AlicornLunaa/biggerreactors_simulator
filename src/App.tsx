@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import ReactorDesigner from './routes/ReactorDesigner';
-import './App.css'
 import About from './routes/About';
+import './App.css'
 
 function App() {
   return (
