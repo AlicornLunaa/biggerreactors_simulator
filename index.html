@@ -8,7 +8,35 @@
     <title>Reactor Simulator</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div class="header">
+        <div class="logo-bar">
+          <img class="logo" src="/reactorsim.svg" />
+          <div class="title">Reactor Simulator</div>
+        </div>
+        <div class="actions">
+          <a href="about.html">About</a>
+          <button class="new-reactor-btn">New</button>
+        </div>
+      </div>
+
+      <div class="reactor-designer">
+        <div class="material-list"></div>
+        <div class="reactor-window"></div>
+      </div>
+
+      <div class="reactor-setup" style="visibility: hidden;">
+        <p>Setup New Reactor</p>
+
+        <div class="reactor-setup-content">
+          <input type="text" id="reactor-width-txt" />
+          <input type="text" id="reactor-depth-txt" />
+          <input type="text" id="reactor-height-txt" />
+          <button id="reactor-submit-btn">Done</button>
+        </div>
+      </div>
+    </div>
+    
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
