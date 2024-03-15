@@ -39,6 +39,10 @@ export default class GenericReactor {
             b = Materials[this.version]["minecraft:air"];
         }
 
+        if(!b){
+            b = Material.EMPTY_MODERATOR;
+        }
+
         return b;
     }
 

@@ -169,12 +169,21 @@
 }
 
 .material-list button {
-  min-width: 100%;
+  width: 100%;
+}
+.material-list button:hover {
+  background-color: #a0dacc;
+}
+.selected-element-btn {
+  background-color: #bdf1e5;
 }
 
 #reactor-canvas {
   width: 100%;
   aspect-ratio: 1;
+}
+#reactor-size-lbl {
+  margin: 0;
 }
 
 a {

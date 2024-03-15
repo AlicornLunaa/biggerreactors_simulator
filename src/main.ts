@@ -16,6 +16,7 @@ let selectedType: string|null = null;
 const setup_elements = () => {
   // Variables
   let elementsDiv = document.querySelector<HTMLDivElement>(".material-list")!;
+  let lastActiveBtn: HTMLButtonElement|null = null;
 
   // Functions
   const select_type = (type: string) => {
@@ -31,7 +32,18 @@ const setup_elements = () => {
       let mat = Materials[reactor.version][key];
       let btn = document.createElement("button") as HTMLButtonElement;
       btn.innerHTML = mat.displayName;
-      btn.addEventListener("click", () => select_type(mat.id));
+
+      btn.addEventListener("click", () => {
+        if(lastActiveBtn){
+          lastActiveBtn.className = "";
+        }
+
+        btn.className = 'selected-element-btn';
+        lastActiveBtn = btn;
+        
+        select_type(mat.id)
+      });
+
       elementsDiv.appendChild(btn);
     }
   };
@@ -167,7 +179,22 @@ const setup_canvas = () => {
   return draw;
 };
 
-const setup_modal = (refresh_elements: () => void, refresh_canvas: () => void) => {
+const setup_simulation = () => {
+  // Variables
+  let sizeTag = document.querySelector<HTMLParagraphElement>("#reactor-size-lbl")!;
+
+  // Functions
+  const update_tags = () => {
+    sizeTag.innerHTML = `Inner Dimensions: ${reactor.width}x${reactor.depth}x${reactor.height}<br>Outer Dimensions: ${reactor.width + 2}x${reactor.depth + 2}x${reactor.height + 2}`;
+  };
+
+  // Events
+
+  // Returns
+  return { update_tags };
+};
+
+const setup_modal = (refresh_elements: () => void, refresh_canvas: () => void, update_tags: () => void) => {
   // Buttons
   let modalWindow = document.querySelector<HTMLButtonElement>("#reactor-modal")!;
 
@@ -196,12 +223,14 @@ const setup_modal = (refresh_elements: () => void, refresh_canvas: () => void) =
     reactor.depth = Number.parseInt(depthInput.value);
     reactor.height = Number.parseInt(heightInput.value);
     refresh_canvas();
+    update_tags();
   }
 
   const update_version = () => {
     reactor.clear();
     reactor.version = versionSelect.value;
     refresh_elements();
+    refresh_canvas();
   };
 
   // Events
@@ -217,4 +246,5 @@ const setup_modal = (refresh_elements: () => void, refresh_canvas: () => void) =
 // Init
 const refresh_elements = setup_elements();
 const refresh_canvas = setup_canvas();
-setup_modal(refresh_elements, refresh_canvas);
+const { update_tags } = setup_simulation();
+setup_modal(refresh_elements, refresh_canvas, update_tags);
