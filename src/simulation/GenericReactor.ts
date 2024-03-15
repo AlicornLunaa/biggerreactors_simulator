@@ -1,4 +1,4 @@
-import { Material } from "./Materials";
+import { Material, Materials } from "./Materials";
 
 /**
  * This is a generic class defining a reactor, agnostic to game version.
@@ -7,11 +7,12 @@ import { Material } from "./Materials";
  */
 export default class GenericReactor {
     // Variables
-    version: string;
-    width: number;
-    depth: number;
-    height: number;
-    blocks: Material[];
+    private blocks: { [key: string]: Material|null };
+
+    public version: string;
+    public width: number;
+    public depth: number;
+    public height: number;
 
     // Constructor
     constructor(){
@@ -19,11 +20,27 @@ export default class GenericReactor {
         this.width = 3;
         this.depth = 3;
         this.height = 3;
-        this.blocks = [];
+        this.blocks = {};
     }
     
     // Functions
-    public clear(){}
+    public clear(){
+        this.blocks = {};
+    }
+
+    public set_block(x: number, y: number, material: Material){
+        this.blocks[`${x} ${y}`] = material;
+    }
+
+    public get_block(x: number, y: number){
+        let b = this.blocks[`${x} ${y}`];
+
+        if(!b){
+            b = Materials[this.version]["minecraft:air"];
+        }
+
+        return b;
+    }
 
     // JSON Interface
     public static parse(data: string): GenericReactor {
@@ -35,8 +52,8 @@ export default class GenericReactor {
         reactor.depth = plainInterface.depth;
         reactor.height = plainInterface.height;
 
-        for(let block of plainInterface.blocks){
-            reactor.blocks.push(block);
+        for(let key in plainInterface.blocks){
+            reactor.blocks[key] = plainInterface.blocks[key];
         }
 
         return reactor;

@@ -7,7 +7,7 @@ const REACTOR_WALL_COLOR = "#202020";
 const REACTOR_ELEMENT_COLOR = "#316B1F";
 const REACTOR_ELEMENT_HOVER_COLOR = "#4FAE0B";
 const REACTOR_ELEMENT_ACTIVE_COLOR = "#46A701";
-const REACTOR_CELL_GAP = 3;
+const REACTOR_CELL_GAP = 1.5;
 
 let reactor = new GenericReactor();
 let selectedType: string|null = null;
@@ -26,8 +26,9 @@ const setup_elements = () => {
     // Load the reactor's version number into the elements
     elementsDiv.innerHTML = "";
 
-    for(const mat of Materials[0]){
+    for(const key in Materials[reactor.version]){
       // Create a button for each element
+      let mat = Materials[reactor.version][key];
       let btn = document.createElement("button") as HTMLButtonElement;
       btn.innerHTML = mat.displayName;
       btn.addEventListener("click", () => select_type(mat.id));
@@ -51,6 +52,10 @@ const setup_canvas = () => {
   let clicking = false;
 
   // Functions
+  const get_mat = (id: string) => {
+    return Materials[reactor.version][id];
+  }
+
   const get_mouse_pos = (ev: MouseEvent) => {
     x:return {
       x: ev.clientX - reactorCanvas.getBoundingClientRect().left,
@@ -62,13 +67,6 @@ const setup_canvas = () => {
     let pos = get_mouse_pos(ev);
     selectedCellX = Math.floor(pos.x / (reactorCanvas.width / (reactor.width + 2)));
     selectedCellY = Math.floor(pos.y / (reactorCanvas.height / (reactor.height + 2)));
-  };
-
-  const resize_canvas = () => {
-    // Resizes the canvas to fit its CSS scales
-    reactorCanvas.style.aspectRatio = (reactor.width / reactor.height).toString();
-    reactorCanvas.width = reactorCanvas.offsetWidth;
-    reactorCanvas.height = reactorCanvas.offsetHeight;
   };
 
   const draw = () => {
@@ -106,22 +104,31 @@ const setup_canvas = () => {
           fill_cell(i, k, REACTOR_WALL_COLOR);
           continue;
         }
+
+        let currentMaterial = reactor.get_block(i - 1, k - 1);
     
         if(selectedCellX == i && selectedCellY == k){
           // Draw a selected cell
           let color = clicking ? REACTOR_ELEMENT_ACTIVE_COLOR : REACTOR_ELEMENT_HOVER_COLOR;
-          fill_cell(i, k, color, "Hello!");
+          fill_cell(i, k, color, currentMaterial.displayName);
         } else {
           // If it is not selected, it should use the default color
-          fill_cell(i, k, REACTOR_ELEMENT_COLOR, "Hello!");
+          fill_cell(i, k, REACTOR_ELEMENT_COLOR, currentMaterial.displayName);
         }
       }
     }
   };
 
+  const resize_canvas = () => {
+    // Resizes the canvas to fit its CSS scales
+    reactorCanvas.style.aspectRatio = (reactor.width / reactor.height).toString();
+    reactorCanvas.width = reactorCanvas.offsetWidth;
+    reactorCanvas.height = reactorCanvas.offsetHeight;
+    draw();
+  };
+
   // Runtime
   resize_canvas();
-  draw();
 
   // Events
   window.addEventListener("resize", () => {
@@ -131,12 +138,22 @@ const setup_canvas = () => {
   
   reactorCanvas.addEventListener("mousemove", (ev) => {
     update_selected_cell(ev);
+
+    if(clicking && selectedType){
+      reactor.set_block(selectedCellX - 1, selectedCellY - 1, get_mat(selectedType))
+    }
+
     draw();
   });
   
   reactorCanvas.addEventListener("mousedown", (ev) => {
     clicking = true;
     update_selected_cell(ev);
+
+    if(selectedType){
+      reactor.set_block(selectedCellX - 1, selectedCellY - 1, get_mat(selectedType))
+    }
+
     draw();
   });
   
