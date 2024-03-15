@@ -1,5 +1,5 @@
 import { Vector3 } from "../Vector";
-import Config from "./Config";
+import Config from "./1_19/Config";
 
 class RayStep {
     static rays: RayStep[][] = [];
