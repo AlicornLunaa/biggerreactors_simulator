@@ -2,6 +2,7 @@ import GenericReactor from './simulation/GenericReactor';
 import { Materials } from './simulation/Materials';
 import "./style.css"
 import "./styles/control_panel.css"
+import "./styles/control_rods.css"
 
 // Global variables
 const REACTOR_WALL_COLOR = "#202020";
@@ -80,6 +81,8 @@ const setup_simulation = () => {
   let activeButton = document.querySelector<HTMLInputElement>("#reactor-active-toggle")!;
   let refuelButton = document.querySelector<HTMLButtonElement>("#reactor-refuel-btn")!;
 
+  let controlRods = document.querySelector<HTMLDivElement>(".rods")!;
+
   // Functions
   const round = (val: number, places: number) => {
     return Math.round(val * places) / places;
@@ -123,6 +126,8 @@ const setup_simulation = () => {
     set_bar_height(caseHeatBar, Math.min(reactorSimulation.stackHeat.temperature / 2000, 1));
     set_bar_height(fuelHeatBar, Math.min(reactorSimulation.fuelHeat.temperature / 2000, 1));
     set_bar_height(batteryBar, (reactorSimulation.battery!.stored / reactorSimulation.battery!.capacity));
+
+    controlRods.innerHTML = ``;
   };
 
   const start_tick_loop = () => {
@@ -174,7 +179,7 @@ const setup_canvas = (update_tags: () => void, create_new_sim: () => void) => {
     selectedCellY = Math.floor(pos.y / (reactorCanvas.height / (reactor.depth + 2)));
   };
 
-  const draw = () => {
+  const refresh_canvas = () => {
     // Clear the canvas to prep a redraw
     ctx.clearRect(0, 0, reactorCanvas.width, reactorCanvas.height);
 
@@ -229,7 +234,7 @@ const setup_canvas = (update_tags: () => void, create_new_sim: () => void) => {
     reactorCanvas.style.aspectRatio = (reactor.width / reactor.depth).toString();
     reactorCanvas.width = reactorCanvas.offsetWidth;
     reactorCanvas.height = reactorCanvas.offsetHeight;
-    draw();
+    refresh_canvas();
   };
 
   // Runtime
@@ -238,7 +243,7 @@ const setup_canvas = (update_tags: () => void, create_new_sim: () => void) => {
   // Events
   window.addEventListener("resize", () => {
     resize_canvas();
-    draw();
+    refresh_canvas();
   });
   
   reactorCanvas.addEventListener("mousemove", (ev) => {
@@ -250,7 +255,7 @@ const setup_canvas = (update_tags: () => void, create_new_sim: () => void) => {
       update_tags();
     }
 
-    draw();
+    refresh_canvas();
   });
   
   reactorCanvas.addEventListener("mousedown", (ev) => {
@@ -263,20 +268,20 @@ const setup_canvas = (update_tags: () => void, create_new_sim: () => void) => {
       update_tags();
     }
 
-    draw();
+    refresh_canvas();
   });
   
   reactorCanvas.addEventListener("mouseup", (ev) => {
     clicking = false;
     update_selected_cell(ev);
-    draw();
+    refresh_canvas();
   });
 
   // Canvas refresher
-  return draw;
+  return { refresh_canvas, resize_canvas };
 };
 
-const setup_modal = (refresh_elements: () => void, refresh_canvas: () => void, update_tags: () => void) => {
+const setup_modal = (refresh_elements: () => void, refresh_canvas: () => void, resize_canvas: () => void, update_tags: () => void, create_new_sim: () => void) => {
   // Buttons
   let modalWindow = document.querySelector<HTMLButtonElement>("#reactor-modal")!;
 
@@ -304,7 +309,10 @@ const setup_modal = (refresh_elements: () => void, refresh_canvas: () => void, u
     reactor.width = Number.parseInt(widthInput.value);
     reactor.depth = Number.parseInt(depthInput.value);
     reactor.height = Number.parseInt(heightInput.value);
+    reactor.clear();
+    resize_canvas();
     refresh_canvas();
+    create_new_sim();
     update_tags();
   }
 
@@ -328,5 +336,5 @@ const setup_modal = (refresh_elements: () => void, refresh_canvas: () => void, u
 // Init
 const refresh_elements = setup_elements();
 const { update_tags, create_new_sim } = setup_simulation();
-const refresh_canvas = setup_canvas(update_tags, create_new_sim);
-setup_modal(refresh_elements, refresh_canvas, update_tags);
+const { refresh_canvas, resize_canvas } = setup_canvas(update_tags, create_new_sim);
+setup_modal(refresh_elements, refresh_canvas, resize_canvas, update_tags, create_new_sim);

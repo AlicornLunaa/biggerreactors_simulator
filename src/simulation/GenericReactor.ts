@@ -30,12 +30,12 @@ export default class GenericReactor {
         this.blocks = {};
     }
 
-    public set_block(x: number, y: number, material: Material){
-        this.blocks[`${x} ${y}`] = material;
+    public set_block(x: number, z: number, material: Material){
+        this.blocks[`${x} ${z}`] = material;
     }
 
-    public get_block(x: number, y: number){
-        let b = this.blocks[`${x} ${y}`];
+    public get_block(x: number, z: number){
+        let b = this.blocks[`${x} ${z}`];
 
         if(!b){
             b = Materials[this.version]["minecraft:air"];
@@ -50,7 +50,7 @@ export default class GenericReactor {
 
     public get_simulation(){
         let desc = new SimulationDescription();
-        desc.setSize(this.width, this.depth, this.height);
+        desc.setSize(this.width, this.height, this.depth);
 
         for(let x = 0; x < this.width; x++){
             for(let z = 0; z < this.depth; z++){
