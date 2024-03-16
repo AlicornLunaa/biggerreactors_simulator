@@ -37,7 +37,9 @@ export default class GenericReactor {
     public get_block(x: number, z: number){
         let b = this.blocks[`${x} ${z}`];
 
-        if(!b){
+        if(!Materials[this.version]){
+            b = Material.EMPTY_MODERATOR;
+        } else if(!b){
             b = Materials[this.version]["minecraft:air"];
         }
 
