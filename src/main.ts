@@ -1,6 +1,6 @@
 import GenericReactor from './simulation/GenericReactor';
 import { Materials } from './simulation/Materials';
-import "./style.css"
+import "./styles/global.css"
 import "./styles/control_panel.css"
 import "./styles/control_rods.css"
 
@@ -113,20 +113,31 @@ const setup_simulation = () => {
 
     if(reactorSimulation.controlRods.length == 0){
       controlRods.innerHTML = "No control rods";
+      return;
     }
 
+    const set_rod = (i: number, slider: HTMLInputElement, lbl: HTMLSpanElement) => {
+      reactorSimulation.controlRods[i].insertion = Number.parseFloat(slider.value);
+      lbl.innerHTML = `Rod ${i + 1} at ${slider.value}% insertion`;
+    };
+
+    // Create new sliders
     for(let i = 0; i < reactorSimulation.controlRods.length; i++){
+      let container = document.createElement("div");
+      container.className = "control-rod-slider";
+
       let slider = document.createElement("input");
-      slider.className = "control-rod-slider";
       slider.type = "range";
       slider.min = "0";
       slider.max = "100";
       slider.value = "0";
       slider.step = "0.1";
 
+      let label = document.createElement("span");
+      label.innerHTML = `Rod ${i + 1} at ${slider.value}% insertion`;
+
       slider.addEventListener("input", () => {
-        let v = Number.parseFloat(slider.value);
-        reactorSimulation.controlRods[i].insertion = v;
+        set_rod(i, slider, label);
 
         if(controlRodLock.checked){
           // Update all others if its checked
@@ -134,13 +145,16 @@ const setup_simulation = () => {
           
           sliderList.forEach((element, key) => {
             if(key == i) return;
-            element.value = slider.value;
-            reactorSimulation.controlRods[key].insertion = v;
+            let otherSlider = element.querySelector<HTMLInputElement>("input")!;
+            set_rod(key, otherSlider, element.querySelector<HTMLSpanElement>("span")!);
+            otherSlider.value = slider.value;
           });
         }
       });
 
-      controlRods.appendChild(slider);
+      container.appendChild(label);
+      container.appendChild(slider);
+      controlRods.appendChild(container);
     }
   };
 

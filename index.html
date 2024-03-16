@@ -41,7 +41,7 @@
               <div class="stat" id="waste-stat">Waste: 0 mB</div>
               <div class="stat" id="bat-stat">Battery: 0 RF</div>
               <div class="stat">
-                <input type="checkbox" id="reactor-active-toggle">Active</input>
+                <input type="checkbox" id="reactor-active-toggle" /><label for="reactor-active-toggle">Active</label>
                 <button id="reactor-refuel-btn">Refuel</button>
               </div>
             </div>
@@ -55,9 +55,10 @@
             </div>
           </div>
           <div class="control-rod-status">
-            <div class="rod-title">Control Rods<input type="checkbox" id="control-rod-lock" /></div>
+            <div class="rod-title">Control Rods</div>
+            <div class="lock-option"><input type="checkbox" id="control-rod-lock" /><label for="control-rod-lock">Lock</label></div>
             <div class="break"></div>
-            <div class="rods">No Rods</div>
+            <div class="rods">No control rods</div>
           </div>
         </div>
       </div>
