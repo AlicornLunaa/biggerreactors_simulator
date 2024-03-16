@@ -1,4 +1,6 @@
 import { Material, Materials } from "./Materials";
+import SimulationDescription from "./reactors/1_19/SimulationDescription";
+import TimeSlicedReactorSimulation from "./reactors/1_19/TimeSlicedReactorSimulation";
 
 /**
  * This is a generic class defining a reactor, agnostic to game version.
@@ -44,6 +46,31 @@ export default class GenericReactor {
         }
 
         return b;
+    }
+
+    public get_simulation(){
+        let desc = new SimulationDescription();
+        desc.setSize(this.width, this.depth, this.height);
+
+        for(let x = 0; x < this.width; x++){
+            for(let z = 0; z < this.depth; z++){
+                let block = this.get_block(x, z);
+
+                if(block.id == "biggerreactors:fuel_rod"){
+                    // Yummy fun rods
+                    desc.setControlRod(x, z, true);
+                    continue;
+                }
+
+                desc.setControlRod(x, z, false);
+
+                for(let y = 0; y < this.height; y++){
+                    desc.setModeratorProperties(x, y, z, block);
+                }
+            }
+        }
+
+        return new TimeSlicedReactorSimulation(desc);
     }
 
     // JSON Interface

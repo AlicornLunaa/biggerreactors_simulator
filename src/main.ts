@@ -1,6 +1,7 @@
 import GenericReactor from './simulation/GenericReactor';
 import { Materials } from './simulation/Materials';
-import './style.css'
+import "./style.css"
+import "./styles/control_panel.css"
 
 // Global variables
 const REACTOR_WALL_COLOR = "#202020";
@@ -40,7 +41,7 @@ const setup_elements = () => {
 
         btn.className = 'selected-element-btn';
         lastActiveBtn = btn;
-        
+
         select_type(mat.id)
       });
 
@@ -55,7 +56,99 @@ const setup_elements = () => {
   return populate;
 };
 
-const setup_canvas = () => {
+const setup_simulation = () => {
+  // Variables
+  let reactorSimulation = reactor.get_simulation();
+
+  let sizeTag = document.querySelector<HTMLParagraphElement>("#reactor-size-lbl")!;
+
+  let tempStatLbl = document.querySelector<HTMLDivElement>("#temp-stat")!;
+  let generationStatLbl = document.querySelector<HTMLDivElement>("#gen-stat")!;
+  let fuelUseStatLbl = document.querySelector<HTMLDivElement>("#fuel-use-stat")!;
+  let efficiencyStatLbl = document.querySelector<HTMLDivElement>("#rf-per-stat")!;
+  let reactivityStatLbl = document.querySelector<HTMLDivElement>("#react-stat")!;
+  let fuelStatLbl = document.querySelector<HTMLDivElement>("#fuel-stat")!;
+  let wasteStatLbl = document.querySelector<HTMLDivElement>("#waste-stat")!;
+  let batteryStatLbl = document.querySelector<HTMLDivElement>("#bat-stat")!;
+
+  let fuelBar = document.querySelector<HTMLDivElement>("#fuel-bar")!;
+  let wasteBar = document.querySelector<HTMLDivElement>("#waste-bar")!;
+  let caseHeatBar = document.querySelector<HTMLDivElement>("#case-heat-bar")!;
+  let fuelHeatBar = document.querySelector<HTMLDivElement>("#fuel-heat-bar")!;
+  let batteryBar = document.querySelector<HTMLDivElement>("#battery-bar")!;
+
+  let activeButton = document.querySelector<HTMLInputElement>("#reactor-active-toggle")!;
+  let refuelButton = document.querySelector<HTMLButtonElement>("#reactor-refuel-btn")!;
+
+  // Functions
+  const round = (val: number, places: number) => {
+    return Math.round(val * places) / places;
+  };
+
+  const unit = (rf: number): [number, string] => {
+    if(rf >= 1_000_000){
+      return [round(rf / 1_000_000, 100), "MiRF/t"];
+    } else if(rf >= 1000){
+      return [round(rf / 1000, 100), "KiRF/t"];
+    }
+
+    return [Math.round(rf), "RF/t"];
+  };
+
+  const set_bar_height = (bar: HTMLDivElement, val: number) => {
+    bar.style.top = `${(1 - val) * 100}%`;
+    bar.style.height = `${val * 100}%`;
+  };
+
+  const create_new_sim = () => {
+    reactorSimulation = reactor.get_simulation();
+  };
+
+  const update_tags = () => {
+    sizeTag.innerHTML = `Inner Dimensions: ${reactor.width}x${reactor.depth}x${reactor.height}<br>Outer Dimensions: ${reactor.width + 2}x${reactor.depth + 2}x${reactor.height + 2}`;
+
+    let [rfGenerated, rfUnit] = unit(reactorSimulation.battery!.generatedLastTick);
+
+    tempStatLbl.innerHTML = `Temperature: ${round(reactorSimulation.fuelHeat.temperature, 1)} K`;
+    generationStatLbl.innerHTML = `Generation: ${rfGenerated} ${rfUnit}`;
+    fuelUseStatLbl.innerHTML = `Fuel usage: ${round(reactorSimulation.fuelTank.burnedLastTick, 1000)} mB/t`;
+    efficiencyStatLbl.innerHTML = `RF per fuel: ${reactorSimulation.fuelTank.burnedLastTick == 0 ? 0 : round(rfGenerated / reactorSimulation.fuelTank.burnedLastTick, 1000)} RF/mB/t`;
+    reactivityStatLbl.innerHTML = `Reactivity: ${round(reactorSimulation.fertility() * 100, 10)}%`;
+    fuelStatLbl.innerHTML = `Fuel: ${Math.round(reactorSimulation.fuelTank.fuel)}/${Math.round(reactorSimulation.fuelTank.capacity)}`;
+    wasteStatLbl.innerHTML = `Waste: ${Math.round(reactorSimulation.fuelTank.waste)}/${Math.round(reactorSimulation.fuelTank.capacity)}`;
+    batteryStatLbl.innerHTML = `Battery: ${Math.round(reactorSimulation.battery!.stored)}/${Math.round(reactorSimulation.battery!.capacity)}`;
+
+    set_bar_height(fuelBar, reactorSimulation.fuelTank.fuel / reactorSimulation.fuelTank.capacity);
+    set_bar_height(wasteBar, reactorSimulation.fuelTank.waste / reactorSimulation.fuelTank.capacity);
+    set_bar_height(caseHeatBar, Math.min(reactorSimulation.stackHeat.temperature / 2000, 1));
+    set_bar_height(fuelHeatBar, Math.min(reactorSimulation.fuelHeat.temperature / 2000, 1));
+    set_bar_height(batteryBar, (reactorSimulation.battery!.stored / reactorSimulation.battery!.capacity));
+  };
+
+  const start_tick_loop = () => {
+    setInterval(() => {
+      reactorSimulation.tick(activeButton.checked);
+      update_tags();
+    }, 50);
+  };
+
+  // Events
+  refuelButton.addEventListener("click", () => {
+    reactorSimulation.fuelTank.fuel = reactorSimulation.fuelTank.capacity;
+    reactorSimulation.fuelTank.partialUsed = 0;
+    reactorSimulation.fuelTank.waste = 0;
+    update_tags();
+  });
+
+  // Runtime
+  update_tags();
+  start_tick_loop();
+
+  // Returns
+  return { update_tags, create_new_sim };
+};
+
+const setup_canvas = (update_tags: () => void, create_new_sim: () => void) => {
   // Variables
   let reactorCanvas = document.querySelector<HTMLCanvasElement>("#reactor-canvas")!;
   let ctx = reactorCanvas.getContext("2d")!;
@@ -78,7 +171,7 @@ const setup_canvas = () => {
   const update_selected_cell = (ev: MouseEvent) => {
     let pos = get_mouse_pos(ev);
     selectedCellX = Math.floor(pos.x / (reactorCanvas.width / (reactor.width + 2)));
-    selectedCellY = Math.floor(pos.y / (reactorCanvas.height / (reactor.height + 2)));
+    selectedCellY = Math.floor(pos.y / (reactorCanvas.height / (reactor.depth + 2)));
   };
 
   const draw = () => {
@@ -87,7 +180,7 @@ const setup_canvas = () => {
 
     // Reactor width is over-estimated by 2 to account for the walls of the reactor. They aren't real blocks.
     let cellWidth = reactorCanvas.width / (reactor.width + 2);
-    let cellHeight = reactorCanvas.height / (reactor.height + 2);
+    let cellHeight = reactorCanvas.height / (reactor.depth + 2);
 
     // Helper
     const fill_cell = (x: number, y: number, style: string, text?: string) => {
@@ -110,9 +203,9 @@ const setup_canvas = () => {
 
     // Draw each cell or 'block' in the reactor, top-down
     for(let i = 0; i < reactor.width + 2; i++){
-      for(let k = 0; k < reactor.height + 2; k++){
+      for(let k = 0; k < reactor.depth + 2; k++){
         // Draw a wall block and stop all other calculations
-        if(i == 0 || i == reactor.width + 1 || k == 0 || k == reactor.height + 1){
+        if(i == 0 || i == reactor.width + 1 || k == 0 || k == reactor.depth + 1){
           fill_cell(i, k, REACTOR_WALL_COLOR);
           continue;
         }
@@ -133,7 +226,7 @@ const setup_canvas = () => {
 
   const resize_canvas = () => {
     // Resizes the canvas to fit its CSS scales
-    reactorCanvas.style.aspectRatio = (reactor.width / reactor.height).toString();
+    reactorCanvas.style.aspectRatio = (reactor.width / reactor.depth).toString();
     reactorCanvas.width = reactorCanvas.offsetWidth;
     reactorCanvas.height = reactorCanvas.offsetHeight;
     draw();
@@ -152,7 +245,9 @@ const setup_canvas = () => {
     update_selected_cell(ev);
 
     if(clicking && selectedType){
-      reactor.set_block(selectedCellX - 1, selectedCellY - 1, get_mat(selectedType))
+      reactor.set_block(selectedCellX - 1, selectedCellY - 1, get_mat(selectedType));
+      create_new_sim();
+      update_tags();
     }
 
     draw();
@@ -163,7 +258,9 @@ const setup_canvas = () => {
     update_selected_cell(ev);
 
     if(selectedType){
-      reactor.set_block(selectedCellX - 1, selectedCellY - 1, get_mat(selectedType))
+      reactor.set_block(selectedCellX - 1, selectedCellY - 1, get_mat(selectedType));
+      create_new_sim();
+      update_tags();
     }
 
     draw();
@@ -177,21 +274,6 @@ const setup_canvas = () => {
 
   // Canvas refresher
   return draw;
-};
-
-const setup_simulation = () => {
-  // Variables
-  let sizeTag = document.querySelector<HTMLParagraphElement>("#reactor-size-lbl")!;
-
-  // Functions
-  const update_tags = () => {
-    sizeTag.innerHTML = `Inner Dimensions: ${reactor.width}x${reactor.depth}x${reactor.height}<br>Outer Dimensions: ${reactor.width + 2}x${reactor.depth + 2}x${reactor.height + 2}`;
-  };
-
-  // Events
-
-  // Returns
-  return { update_tags };
 };
 
 const setup_modal = (refresh_elements: () => void, refresh_canvas: () => void, update_tags: () => void) => {
@@ -245,6 +327,6 @@ const setup_modal = (refresh_elements: () => void, refresh_canvas: () => void, u
 
 // Init
 const refresh_elements = setup_elements();
-const refresh_canvas = setup_canvas();
-const { update_tags } = setup_simulation();
+const { update_tags, create_new_sim } = setup_simulation();
+const refresh_canvas = setup_canvas(update_tags, create_new_sim);
 setup_modal(refresh_elements, refresh_canvas, update_tags);

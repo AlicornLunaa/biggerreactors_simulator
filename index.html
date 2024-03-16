@@ -24,7 +24,36 @@
         <div class="material-list grid-element"></div>
         <div class="reactor-window grid-element">
           <canvas id="reactor-canvas" width="2048" height="2048">HTML canvas not supported</canvas>
+
           <p id="reactor-size-lbl">Inner Dimensions: 3x3x3<br>Outer Dimensions: 5x5x5</p>
+
+          <div class="reactor-status">
+            <div class="reactor-title">Reactor Info</div>
+            <div class="break"></div>
+
+            <div class="status-left">
+              <div class="stat" id="temp-stat">Temperature: 0 K</div>
+              <div class="stat" id="gen-stat">Generation: 0 RF/t</div>
+              <div class="stat" id="fuel-use-stat">Fuel Usage: 0 mB/t</div>
+              <div class="stat" id="rf-per-stat">RF per fuel: 0 RF/mB/t</div>
+              <div class="stat" id="react-stat">Reactivity: 0%</div>
+              <div class="stat" id="fuel-stat">Fuel: 0 mB</div>
+              <div class="stat" id="waste-stat">Waste: 0 mB</div>
+              <div class="stat" id="bat-stat">Battery: 0 RF</div>
+              <div class="stat">
+                <input type="checkbox" id="reactor-active-toggle">Active</input>
+                <button id="reactor-refuel-btn">Refuel</button>
+              </div>
+            </div>
+
+            <div class="status-right">
+              <div class="bar" id="fuel-bar"></div>
+              <div class="bar" id="waste-bar"></div>
+              <div class="bar" id="case-heat-bar"></div>
+              <div class="bar" id="fuel-heat-bar"></div>
+              <div class="bar" id="battery-bar"></div>
+            </div>
+          </div>
         </div>
       </div>
 
