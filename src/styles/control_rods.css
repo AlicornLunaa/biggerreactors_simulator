@@ -12,7 +12,6 @@
     padding: 1em;
 }
 .rod-title input {
-    display: none;
     margin-left: auto;
     margin-right: 0;
 }
@@ -30,7 +29,9 @@
     border-radius: 0px 0px 0px 5px;
     width: calc(100% - 1.618em);
 }
-
+.rods input {
+    width: calc(100% - 1.618em);
+}
 .rods p {
     padding: 0px;
     margin: 0px;

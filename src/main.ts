@@ -82,6 +82,7 @@ const setup_simulation = () => {
   let refuelButton = document.querySelector<HTMLButtonElement>("#reactor-refuel-btn")!;
 
   let controlRods = document.querySelector<HTMLDivElement>(".rods")!;
+  let controlRodLock = document.querySelector<HTMLInputElement>("#control-rod-lock")!;
 
   // Functions
   const round = (val: number, places: number) => {
@@ -107,6 +108,42 @@ const setup_simulation = () => {
     reactorSimulation = reactor.get_simulation();
   };
 
+  const update_rods = () => {
+    controlRods.innerHTML = "";
+
+    if(reactorSimulation.controlRods.length == 0){
+      controlRods.innerHTML = "No control rods";
+    }
+
+    for(let i = 0; i < reactorSimulation.controlRods.length; i++){
+      let slider = document.createElement("input");
+      slider.className = "control-rod-slider";
+      slider.type = "range";
+      slider.min = "0";
+      slider.max = "100";
+      slider.value = "0";
+      slider.step = "0.1";
+
+      slider.addEventListener("input", () => {
+        let v = Number.parseFloat(slider.value);
+        reactorSimulation.controlRods[i].insertion = v;
+
+        if(controlRodLock.checked){
+          // Update all others if its checked
+          let sliderList = document.querySelectorAll<HTMLInputElement>(".control-rod-slider");
+          
+          sliderList.forEach((element, key) => {
+            if(key == i) return;
+            element.value = slider.value;
+            reactorSimulation.controlRods[key].insertion = v;
+          });
+        }
+      });
+
+      controlRods.appendChild(slider);
+    }
+  };
+
   const update_tags = () => {
     sizeTag.innerHTML = `Inner Dimensions: ${reactor.width}x${reactor.depth}x${reactor.height}<br>Outer Dimensions: ${reactor.width + 2}x${reactor.depth + 2}x${reactor.height + 2}`;
 
@@ -126,8 +163,6 @@ const setup_simulation = () => {
     set_bar_height(caseHeatBar, Math.min(reactorSimulation.stackHeat.temperature / 2000, 1));
     set_bar_height(fuelHeatBar, Math.min(reactorSimulation.fuelHeat.temperature / 2000, 1));
     set_bar_height(batteryBar, (reactorSimulation.battery!.stored / reactorSimulation.battery!.capacity));
-
-    controlRods.innerHTML = ``;
   };
 
   const start_tick_loop = () => {
@@ -150,10 +185,10 @@ const setup_simulation = () => {
   start_tick_loop();
 
   // Returns
-  return { update_tags, create_new_sim };
+  return { update_tags, create_new_sim, update_rods };
 };
 
-const setup_canvas = (update_tags: () => void, create_new_sim: () => void) => {
+const setup_canvas = (update_tags: () => void, create_new_sim: () => void, update_rods: () => void) => {
   // Variables
   let reactorCanvas = document.querySelector<HTMLCanvasElement>("#reactor-canvas")!;
   let ctx = reactorCanvas.getContext("2d")!;
@@ -237,6 +272,22 @@ const setup_canvas = (update_tags: () => void, create_new_sim: () => void) => {
     refresh_canvas();
   };
 
+  const place_block = () => {
+    if(selectedType == null){
+      selectedType = "minecraft:air";
+    }
+
+    let updateRodsAfter = (reactor.get_block(selectedCellX - 1, selectedCellY - 1).id == "biggerreactors:fuel_rod");
+
+    reactor.set_block(selectedCellX - 1, selectedCellY - 1, get_mat(selectedType));
+    create_new_sim();
+    update_tags();
+
+    if(selectedType == "biggerreactors:fuel_rod" || updateRodsAfter){
+      update_rods();
+    }
+  };
+
   // Runtime
   resize_canvas();
 
@@ -250,9 +301,7 @@ const setup_canvas = (update_tags: () => void, create_new_sim: () => void) => {
     update_selected_cell(ev);
 
     if(clicking && selectedType){
-      reactor.set_block(selectedCellX - 1, selectedCellY - 1, get_mat(selectedType));
-      create_new_sim();
-      update_tags();
+      place_block();
     }
 
     refresh_canvas();
@@ -263,9 +312,7 @@ const setup_canvas = (update_tags: () => void, create_new_sim: () => void) => {
     update_selected_cell(ev);
 
     if(selectedType){
-      reactor.set_block(selectedCellX - 1, selectedCellY - 1, get_mat(selectedType));
-      create_new_sim();
-      update_tags();
+      place_block();
     }
 
     refresh_canvas();
@@ -309,7 +356,6 @@ const setup_modal = (refresh_elements: () => void, refresh_canvas: () => void, r
     reactor.width = Number.parseInt(widthInput.value);
     reactor.depth = Number.parseInt(depthInput.value);
     reactor.height = Number.parseInt(heightInput.value);
-    reactor.clear();
     resize_canvas();
     refresh_canvas();
     create_new_sim();
@@ -331,10 +377,13 @@ const setup_modal = (refresh_elements: () => void, refresh_canvas: () => void, r
   openBtn.addEventListener("click", open_modal);
   closeBtn.addEventListener("click", close_modal);
   window.addEventListener("click", (ev) => { if(ev.target == modalWindow) close_modal(); });
+
+  // Runtime
+  update_version();
 };
 
 // Init
 const refresh_elements = setup_elements();
-const { update_tags, create_new_sim } = setup_simulation();
-const { refresh_canvas, resize_canvas } = setup_canvas(update_tags, create_new_sim);
+const { update_tags, create_new_sim, update_rods } = setup_simulation();
+const { refresh_canvas, resize_canvas } = setup_canvas(update_tags, create_new_sim, update_rods);
 setup_modal(refresh_elements, refresh_canvas, resize_canvas, update_tags, create_new_sim);
