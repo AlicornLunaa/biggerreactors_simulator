@@ -111,18 +111,18 @@ const setup_simulation = () => {
   const update_rods = () => {
     controlRods.innerHTML = "";
 
-    if(reactorSimulation.controlRods.length == 0){
+    if(reactorSimulation.get_control_rod_count() == 0){
       controlRods.innerHTML = "No control rods";
       return;
     }
 
     const set_rod = (i: number, slider: HTMLInputElement, lbl: HTMLSpanElement) => {
-      reactorSimulation.controlRods[i].insertion = Number.parseFloat(slider.value);
+      reactorSimulation.set_control_rod(i, Number.parseFloat(slider.value));
       lbl.innerHTML = `Rod ${i + 1} at ${slider.value}% insertion`;
     };
 
     // Create new sliders
-    for(let i = 0; i < reactorSimulation.controlRods.length; i++){
+    for(let i = 0; i < reactorSimulation.get_control_rod_count(); i++){
       let container = document.createElement("div");
       container.className = "control-rod-slider";
 
@@ -161,22 +161,22 @@ const setup_simulation = () => {
   const update_tags = () => {
     sizeTag.innerHTML = `Inner Dimensions: ${reactor.width}x${reactor.depth}x${reactor.height}<br>Outer Dimensions: ${reactor.width + 2}x${reactor.depth + 2}x${reactor.height + 2}`;
 
-    let [rfGenerated, rfUnit] = unit(reactorSimulation.battery!.generatedLastTick);
+    let [rfGenerated, rfUnit] = unit(reactorSimulation.get_generated());
 
-    tempStatLbl.innerHTML = `Temperature: ${round(reactorSimulation.fuelHeat.temperature, 1)} K`;
+    tempStatLbl.innerHTML = `Temperature: ${round(reactorSimulation.get_fuel_temperature(), 1)} K`;
     generationStatLbl.innerHTML = `Generation: ${rfGenerated} ${rfUnit}`;
-    fuelUseStatLbl.innerHTML = `Fuel usage: ${round(reactorSimulation.fuelTank.burnedLastTick, 1000)} mB/t`;
-    efficiencyStatLbl.innerHTML = `RF per fuel: ${reactorSimulation.fuelTank.burnedLastTick == 0 ? 0 : round(rfGenerated / reactorSimulation.fuelTank.burnedLastTick, 1000)} RF/mB/t`;
-    reactivityStatLbl.innerHTML = `Reactivity: ${round(reactorSimulation.fertility() * 100, 10)}%`;
-    fuelStatLbl.innerHTML = `Fuel: ${Math.round(reactorSimulation.fuelTank.fuel)}/${Math.round(reactorSimulation.fuelTank.capacity)}`;
-    wasteStatLbl.innerHTML = `Waste: ${Math.round(reactorSimulation.fuelTank.waste)}/${Math.round(reactorSimulation.fuelTank.capacity)}`;
-    batteryStatLbl.innerHTML = `Battery: ${Math.round(reactorSimulation.battery!.stored)}/${Math.round(reactorSimulation.battery!.capacity)}`;
+    fuelUseStatLbl.innerHTML = `Fuel usage: ${round(reactorSimulation.get_fuel_burned(), 1000)} mB/t`;
+    efficiencyStatLbl.innerHTML = `RF per fuel: ${reactorSimulation.get_fuel_burned() == 0 ? 0 : round(rfGenerated / reactorSimulation.get_fuel_burned(), 1000)} RF/mB/t`;
+    reactivityStatLbl.innerHTML = `Reactivity: ${round(reactorSimulation.get_fertility() * 100, 10)}%`;
+    fuelStatLbl.innerHTML = `Fuel: ${Math.round(reactorSimulation.get_fuel())}/${Math.round(reactorSimulation.get_fuel_capacity())}`;
+    wasteStatLbl.innerHTML = `Waste: ${Math.round(reactorSimulation.get_waste())}/${Math.round(reactorSimulation.get_fuel_capacity())}`;
+    batteryStatLbl.innerHTML = `Battery: ${Math.round(reactorSimulation.get_energy())}/${Math.round(reactorSimulation.get_energy_capacity())}`;
 
-    set_bar_height(fuelBar, reactorSimulation.fuelTank.fuel / reactorSimulation.fuelTank.capacity);
-    set_bar_height(wasteBar, reactorSimulation.fuelTank.waste / reactorSimulation.fuelTank.capacity);
-    set_bar_height(caseHeatBar, Math.min(reactorSimulation.stackHeat.temperature / 2000, 1));
-    set_bar_height(fuelHeatBar, Math.min(reactorSimulation.fuelHeat.temperature / 2000, 1));
-    set_bar_height(batteryBar, (reactorSimulation.battery!.stored / reactorSimulation.battery!.capacity));
+    set_bar_height(fuelBar, reactorSimulation.get_fuel() / reactorSimulation.get_fuel_capacity());
+    set_bar_height(wasteBar, reactorSimulation.get_waste() / reactorSimulation.get_fuel_capacity());
+    set_bar_height(caseHeatBar, Math.min(reactorSimulation.get_stack_temperature() / 2000, 1));
+    set_bar_height(fuelHeatBar, Math.min(reactorSimulation.get_fuel_temperature() / 2000, 1));
+    set_bar_height(batteryBar, (reactorSimulation.get_energy() / reactorSimulation.get_energy_capacity()));
   };
 
   const start_tick_loop = () => {
@@ -188,9 +188,7 @@ const setup_simulation = () => {
 
   // Events
   refuelButton.addEventListener("click", () => {
-    reactorSimulation.fuelTank.fuel = reactorSimulation.fuelTank.capacity;
-    reactorSimulation.fuelTank.partialUsed = 0;
-    reactorSimulation.fuelTank.waste = 0;
+    reactorSimulation.refuel();
     update_tags();
   });
 

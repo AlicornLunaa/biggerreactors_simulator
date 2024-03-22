@@ -1,6 +1,6 @@
 import { Material, Materials } from "./Materials";
-import SimulationDescription from "./reactors/1_19/SimulationDescription";
-import TimeSlicedReactorSimulation from "./reactors/1_19/TimeSlicedReactorSimulation";
+import SimulationDescription from "./reactors/biggerreactors/1_19/SimulationDescription";
+import TimeSlicedReactorSimulation from "./reactors/biggerreactors/1_19/TimeSlicedReactorSimulation";
 
 /**
  * This is a generic class defining a reactor, agnostic to game version.
@@ -50,7 +50,7 @@ export default class GenericReactor {
         return b;
     }
 
-    public get_simulation(){
+    public get_simulation(): ReactorInterface {
         let desc = new SimulationDescription();
         desc.setSize(this.width, this.height, this.depth);
 

@@ -80,7 +80,7 @@ const Materials: { [ver: string]: { [id: string] : Material } } = {
         "thermal:redstone": new Material("thermal:redstone", "Redstone", 0.77, 0.56, 1.61, 2.5),
         "thermal:redstone_flowing": new Material("thermal:redstone_flowing", "Redstone Flowing", 0.75, 0.55, 1.60, 2.5)
     },
-    "biggerreactors_1.20": {
+    "biggerreactors_1.19": {
         "biggerreactors:fuel_rod": new Material("biggerreactors:fuel_rod", "Fuel Rod", 0.0, 0.0, 0.0, 0.0),
         "biggerreactors:ludicrite_block": new Material("biggerreactors:ludicrite_block", "Ludicrite Block", 0.6, 0.87, 3, 3),
         "bloodmagic:life_essence_block": new Material("bloodmagic:life_essence_block", "Life Essence Block", 0.7, 0.55, 1.75, 2.5),

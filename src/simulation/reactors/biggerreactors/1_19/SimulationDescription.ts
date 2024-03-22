@@ -1,4 +1,4 @@
-import { Material } from "../../Materials";
+import { Material } from "../../../Materials";
 
 class SimulationDescription {
 
