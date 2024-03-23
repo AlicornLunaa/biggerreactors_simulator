@@ -20,9 +20,9 @@ export default class GenericReactor {
     // Constructor
     constructor(){
         this.version = "extremereactors_1.20"
-        this.width = 3;
-        this.depth = 3;
-        this.height = 3;
+        this.width = 1;
+        this.depth = 1;
+        this.height = 1;
         this.blocks = {};
     }
     

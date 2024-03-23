@@ -2,68 +2,12 @@ import { Material } from "../../../Materials";
 import { Vector3 } from "../../../Vector";
 import { Config } from "./Config";
 import EnergyConversion from "./EnergyConversion";
+import { FuelProperties } from "./FuelProperties";
+import { FuelRodMap } from "./FuelRodMap";
+import { IrradiationSource } from "./IrradiationSource";
+import { Variant } from "./Variant";
 
-class Variant {
-    // Types
-    public static readonly Basic = new Variant("basic", 0.9, 0.1, 0.5, 0, 10000, 0.8, 50000, 0, 0, 0);
-    public static readonly Reinforced = new Variant("reinforced", 0.75, 0.15, 0.75, 0.95, 30000, 0.85, 5000000, 1000, 200000, 0.85);
-
-    // Properties
-    name: string;
-    radiationAttenuation: number;
-    residualRadiationAttenuation: number;
-    solidFuelConversionEfficiency: number;
-    fluidFuelConversionEfficiency: number;
-    partEnergyCapacity: number;
-    energyGenerationEfficiency: number;
-    maxEnergyExtractionRate: number;
-    partFluidCapacity: number;
-    maxFluidCapacity: number;
-    vaporGenerationEfficiency: number;
-
-    // Constructor
-    private constructor(name: "basic"|"reinforced", radAttenuation: number, residRadAttenuation: number, solidEfficiency: number, fluidEfficiency: number,
-            partEnergyCapacity: number, energyGenEff: number, maxEnergyExtract: number, partFluidCap: number, maxFluidCap: number, vaporGenEff: number){
-        this.name = name;
-        this.radiationAttenuation = radAttenuation;
-        this.residualRadiationAttenuation = residRadAttenuation;
-        this.solidFuelConversionEfficiency = solidEfficiency;
-        this.fluidFuelConversionEfficiency = fluidEfficiency;
-        this.partEnergyCapacity = partEnergyCapacity;
-        this.energyGenerationEfficiency = energyGenEff;
-        this.maxEnergyExtractionRate = maxEnergyExtract;
-        this.partFluidCapacity = partFluidCap;
-        this.maxFluidCapacity = maxFluidCap;
-        this.vaporGenerationEfficiency = vaporGenEff;
-    }
-
-    // Functions
-    public solidSourceAmountToReactantAmount(originalAmount: number) { return Math.floor(originalAmount * this.solidFuelConversionEfficiency); }
-    public reactantAmountToSolidSourceAmount(originalAmount: number) { return Math.floor(originalAmount / this.solidFuelConversionEfficiency); }
-    public fluidSourceAmountToReactantAmount(originalAmount: number) { return Math.floor(originalAmount * this.fluidFuelConversionEfficiency); }
-    public reactantAmountToFluidSourceAmount(originalAmount: number) { return Math.floor(originalAmount / this.fluidFuelConversionEfficiency); }
-};
-
-class FuelProperties {
-    static readonly DEFAULT: FuelProperties = { moderationFactor: 1.5, absorptionCoefficient: 0.5, hardnessDivisor: 1.0, fissionEventsPerFuelUnit: 0.01, fuelUnitsPerFissionEvent: 0.0007 };
-    static readonly INVALID: FuelProperties = { moderationFactor: 1, absorptionCoefficient: 0, hardnessDivisor: 1.0, fissionEventsPerFuelUnit: 0, fuelUnitsPerFissionEvent: 0 };
-
-    moderationFactor: number;
-    absorptionCoefficient: number;
-    hardnessDivisor: number;
-    fissionEventsPerFuelUnit: number;
-    fuelUnitsPerFissionEvent: number;
-
-    constructor(modFac: number, absCoeff: number, hard: number, fissionEvents: number, fuelUnits: number) {
-        this.moderationFactor = modFac;
-        this.absorptionCoefficient = absCoeff;
-        this.hardnessDivisor = hard;
-        this.fissionEventsPerFuelUnit = fissionEvents;
-        this.fuelUnitsPerFissionEvent = fuelUnits;
-    }
-};
-
-class ControlRod {
+export class ControlRod {
     x: number;
     z: number;
     insertion: number = 0;
@@ -71,95 +15,6 @@ class ControlRod {
     constructor(x: number, z: number) {
         this.x = x;
         this.z = z;
-    }
-};
-
-class IrradiationSource {
-    worldPosition: Vector3;
-    irradiationDirections = [ new Vector3(-1, 0, 0), new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 0, -1) ];
-    linked: ControlRod|null = null;
-
-    constructor(x: number, y: number, z: number) {
-        this.worldPosition = new Vector3(x, y, z);
-    }
-};
-
-class FuelRodMap {
-    public fuelRods: IrradiationSource[] = [];
-    public map: { [key: string]: number } = {}; // Map coordinates to an index
-
-    private radiationPos = new Vector3(0, 0, 0);
-
-    public set_rod(x: number, y: number, z: number){
-        this.fuelRods.push(new IrradiationSource(x, y, z))
-        this.map[`${x} ${y} ${z}`] = this.fuelRods.length - 1;
-    }
-
-    public get_rod(x: number, y: number, z: number){
-        return this.fuelRods[this.map[`${x} ${y} ${z}`]];
-    }
-
-    public size(){ return this.fuelRods.length; }
-
-    public get_heat_transfer_rate(world: Material[][][]){
-        let rate = 0;
-
-        for(let rod of this.fuelRods){
-            let rodPosition = rod.worldPosition;
-            let heatTransferRate = 0;
-
-            for (let dir of rod.irradiationDirections) {
-                let targetPosition = new Vector3(rodPosition.x + dir.x, rodPosition.y + dir.y, rodPosition.z + dir.z);
-                
-                // Edge-case for casings
-                if(targetPosition.x < 0 || targetPosition.y < 0 || targetPosition.z < 0 || targetPosition.x >= world.length || targetPosition.y >= world[0].length || targetPosition.z >= world[0][0].length){
-                    heatTransferRate += 0.6;
-                    continue;
-                }
-
-                let state = world[targetPosition.x][targetPosition.y][targetPosition.z];
-
-                if(state.id == "minecraft:air") {
-                    heatTransferRate += 0.05;
-                    continue;
-                }
-
-                if(state.id != "biggerreactors:fuel_rod") {
-                    heatTransferRate += state.conductivity;
-                }
-            }
-
-            rate += heatTransferRate;
-        }
-
-        return rate;
-    }
-
-    public get_next(width: number, depth: number, height: number){
-        if(this.fuelRods.length == 0){
-            return null;
-        }
-
-        let current: number|undefined = this.map[`${this.radiationPos.x} ${this.radiationPos.y} ${this.radiationPos.z}`];
-        
-        //! This shits so fucked
-        while(!current) {
-            if(++this.radiationPos.z >= depth){
-                this.radiationPos.z = 0;
-                
-                if(++this.radiationPos.x >= width){
-                    this.radiationPos.x = 0;
-
-                    if(++this.radiationPos.y >= height){
-                        this.radiationPos.y = 0;
-                    }
-                }
-            }
-
-            current = this.map[`${this.radiationPos.x} ${this.radiationPos.y} ${this.radiationPos.z}`];
-        }
-
-        return this.get_rod(this.radiationPos.x, this.radiationPos.y, this.radiationPos.z);
     }
 };
 
@@ -292,7 +147,7 @@ export default class ExtremeReactor implements ReactorInterface {
         if(!active)
             return;
 
-        let source = this.fuelRods.get_next(this.width, this.depth, this.height);
+        let source = this.fuelRods.get_next(this.width);
 
         if(source){
             this.performIrradiationFrom(source);
