@@ -1,6 +1,7 @@
 import { Material, Materials } from "./Materials";
 import SimulationDescription from "./reactors/biggerreactors/1_19/SimulationDescription";
 import TimeSlicedReactorSimulation from "./reactors/biggerreactors/1_19/TimeSlicedReactorSimulation";
+import ExtremeReactor from "./reactors/extremereactors/1_20/ExtremeReactor";
 
 /**
  * This is a generic class defining a reactor, agnostic to game version.
@@ -18,7 +19,7 @@ export default class GenericReactor {
 
     // Constructor
     constructor(){
-        this.version = "1.20"
+        this.version = "extremereactors_1.20"
         this.width = 3;
         this.depth = 3;
         this.height = 3;
@@ -51,28 +52,49 @@ export default class GenericReactor {
     }
 
     public get_simulation(): ReactorInterface {
-        let desc = new SimulationDescription();
-        desc.setSize(this.width, this.height, this.depth);
+        if(this.version == "extremereactors_1.20"){
+            let reactor = new ExtremeReactor(this.width, this.depth, this.height);
 
-        for(let x = 0; x < this.width; x++){
-            for(let z = 0; z < this.depth; z++){
-                let block = this.get_block(x, z);
+            for(let x = 0; x < this.width; x++){
+                for(let z = 0; z < this.depth; z++){
+                    let block = this.get_block(x, z);
 
-                if(block.id == "biggerreactors:fuel_rod"){
-                    // Yummy fun rods
-                    desc.setControlRod(x, z, true);
-                    continue;
-                }
+                    if(block.id == "biggerreactors:fuel_rod"){
+                        // Yummy fun rods
+                        reactor.add_control_rod(x, z, true);
+                    }
 
-                desc.setControlRod(x, z, false);
-
-                for(let y = 0; y < this.height; y++){
-                    desc.setModeratorProperties(x, y, z, block);
+                    for(let y = 0; y < this.height; y++){
+                        reactor.set_block(x, y, z, block);
+                    }
                 }
             }
-        }
 
-        return new TimeSlicedReactorSimulation(desc);
+            return reactor;
+        } else {
+            let desc = new SimulationDescription();
+            desc.setSize(this.width, this.height, this.depth);
+
+            for(let x = 0; x < this.width; x++){
+                for(let z = 0; z < this.depth; z++){
+                    let block = this.get_block(x, z);
+
+                    if(block.id == "biggerreactors:fuel_rod"){
+                        // Yummy fun rods
+                        desc.setControlRod(x, z, true);
+                        continue;
+                    }
+
+                    desc.setControlRod(x, z, false);
+
+                    for(let y = 0; y < this.height; y++){
+                        desc.setModeratorProperties(x, y, z, block);
+                    }
+                }
+            }
+
+            return new TimeSlicedReactorSimulation(desc);
+        }
     }
 
     // JSON Interface
