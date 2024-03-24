@@ -6,11 +6,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google-site-verification" content="NQRKdaPQ85a_ZSyK3ynQtLXckWpGliuGR-pbkFXuSFE" />
     <title>Reactor Simulator</title>
-    <script type="module" crossorigin src="https://alicornlunaa.github.io/biggerreactors_simulator/assets/index-f8aaad32.js"></script>
-    <link rel="stylesheet" href="https://alicornlunaa.github.io/biggerreactors_simulator/assets/index-2ffc54d3.css">
+    <script type="module" crossorigin src="https://alicornlunaa.github.io/biggerreactors_simulator/assets/main-BFp1LQTw.js"></script>
+    <link rel="modulepreload" crossorigin href="https://alicornlunaa.github.io/biggerreactors_simulator/assets/global-B6Ibca-s.js">
+    <link rel="stylesheet" crossorigin href="https://alicornlunaa.github.io/biggerreactors_simulator/assets/global-CGDIwclG.css">
+    <link rel="stylesheet" crossorigin href="https://alicornlunaa.github.io/biggerreactors_simulator/assets/main-BsT2SzzJ.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="app">
+      <div class="header">
+        <div class="logo-bar">
+          <img class="logo" src="https://alicornlunaa.github.io/biggerreactors_simulator/reactorsim.svg" />
+          <div class="title">Reactor Simulator</div>
+        </div>
+        <div class="actions">
+          <a href="index.html">Simulator</a>
+          <a href="about.html">About</a>
+          <button id="new-reactor-btn">Options</button>
+        </div>
+      </div>
+
+      <div class="reactor-designer grid">
+        <div class="material-list grid-element"></div>
+        <div class="reactor-window grid-element">
+          <canvas id="reactor-canvas" width="2048" height="2048">HTML canvas not supported</canvas>
+
+          <p id="reactor-size-lbl">Inner Dimensions: 3x3x3<br>Outer Dimensions: 5x5x5</p>
+
+          <div class="reactor-status">
+            <div class="reactor-title">Reactor Info</div>
+            <div class="break"></div>
+
+            <div class="status-left">
+              <div class="stat" id="temp-stat">Temperature: 0 K</div>
+              <div class="stat" id="gen-stat">Generation: 0 RF/t</div>
+              <div class="stat" id="fuel-use-stat">Fuel Usage: 0 mB/t</div>
+              <div class="stat" id="rf-per-stat">RF per fuel: 0 RF/mB/t</div>
+              <div class="stat" id="react-stat">Reactivity: 0%</div>
+              <div class="stat" id="fuel-stat">Fuel: 0 mB</div>
+              <div class="stat" id="waste-stat">Waste: 0 mB</div>
+              <div class="stat" id="bat-stat">Battery: 0 RF</div>
+              <div class="stat">
+                <input type="checkbox" id="reactor-active-toggle" /><label for="reactor-active-toggle">Active</label>
+                <button id="reactor-refuel-btn">Refuel</button>
+              </div>
+            </div>
+
+            <div class="status-right">
+              <div class="bar" id="fuel-bar"></div>
+              <div class="bar" id="waste-bar"></div>
+              <div class="bar" id="case-heat-bar"></div>
+              <div class="bar" id="fuel-heat-bar"></div>
+              <div class="bar" id="battery-bar"></div>
+            </div>
+          </div>
+          <div class="control-rod-status">
+            <div class="rod-title">Control Rods</div>
+            <div class="lock-option"><input type="checkbox" id="control-rod-lock" /><label for="control-rod-lock">Lock</label></div>
+            <div class="break"></div>
+            <div class="rods">No control rods</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="reactor-modal" class="modal">
+        <div id="reactor-setup" class="modal-content">
+          <p>Reactor Config</p>
+
+          <div class="labeled-field">
+            <span>Version: </span>
+            <select id="reactor-version-txt">
+              <option value="biggerreactors" selected="selected">Bigger Reactors</option>
+              <option value="extremereactors">Extreme Reactors</option>
+              <!-- <optgroup label="Extreme Reactors">
+                <option value="extremereactors_1.20" selected="selected">1.20</option>
+                <option value="extremereactors_1.19">1.19</option>
+                <option value="extremereactors_1.18">1.18</option>
+                <option value="extremereactors_1.17">1.17</option>
+              </optgroup>
+              <optgroup label="Bigger Reactors">
+                <option value="biggerreactors_1.20">1.20</option>
+                <option value="biggerreactors_1.19">1.19</option>
+                <option value="biggerreactors_1.18">1.18</option>
+                <option value="biggerreactors_1.17">1.17</option>
+              </optgroup> -->
+            </select>
+          </div>
+
+          <div class="labeled-field"><span>Width: </span><input type="number" id="reactor-width-txt" min="1" onkeydown="javascript: return ['Backspace','Delete','ArrowLeft','ArrowRight','Tab'].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=='Space'" required /></div>
+          <div class="labeled-field"><span>Depth: </span><input type="number" id="reactor-depth-txt" min="1" onkeydown="javascript: return ['Backspace','Delete','ArrowLeft','ArrowRight','Tab'].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=='Space'" required /></div>
+          <div class="labeled-field"><span>Height: </span><input type="number" id="reactor-height-txt" min="1" onkeydown="javascript: return ['Backspace','Delete','ArrowLeft','ArrowRight','Tab'].includes(event.code) ? true : !isNaN(Number(event.key)) && event.code!=='Space'" required /></div>
+
+          <button id="reactor-submit-btn">Done</button>
+        </div>
+      </div>
+    </div>
     
   </body>
 </html>
