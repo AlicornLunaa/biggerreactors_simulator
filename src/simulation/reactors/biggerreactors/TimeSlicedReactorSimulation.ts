@@ -3,8 +3,7 @@ import Config from "./Config";
 import RayStep from "./Ray";
 import SimulationDescription from "./SimulationDescription";
 
-export default class TimeSlicedReactorSimulation extends BaseReactorSimulation {
-    
+export default class TimeSlicedReactorSimulation extends BaseReactorSimulation implements ReactorInterface {
     currentRod: number = 0;
     rodOffset: number = 0;
 
@@ -126,4 +125,37 @@ export default class TimeSlicedReactorSimulation extends BaseReactorSimulation {
         return rawFuelUsage;
     }
 
+    // Interface
+    refuel(): void {
+        this.fuelTank.fuel = this.fuelTank.capacity;
+        this.fuelTank.partialUsed = 0;
+        this.fuelTank.waste = 0;
+    }
+    
+    get_width(): number { return this.x; }
+    get_depth(): number { return this.z; }
+    get_height(): number { return this.y; }
+
+    get_generated(): number { return this.battery!.generatedLastTick; }
+    get_energy(): number { return this.battery!.stored; }
+    get_energy_capacity(): number { return this.battery!.capacity; }
+    get_stack_temperature(): number { return this.stackHeat.temperature; }
+    get_fuel_temperature(): number { return this.fuelHeat.temperature; }
+    get_fuel_burned(): number { return this.fuelTank.burnedLastTick; }
+    get_fuel(): number { return this.fuelTank.fuel; }
+    get_fuel_capacity(): number { return this.fuelTank.capacity; }
+    get_waste(): number { return this.fuelTank.waste; }
+    get_fertility(): number { return this.fertility(); }
+
+    set_control_rod(index: number, insertion: number): void {
+        this.controlRods[index].insertion = insertion;
+    }
+
+    get_control_rod(index: number): number {
+        return this.controlRods[index].insertion;
+    }
+
+    get_control_rod_count(): number {
+        return this.controlRods.length;
+    }
 }

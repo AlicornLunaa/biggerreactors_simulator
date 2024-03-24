@@ -6,9 +6,9 @@ import ControlRod from "./ControlRod";
 import CoolantTank from "./CoolantTank";
 import FuelTank from "./FuelTank";
 import HeatBody from "./HeatBody";
-import { Material, Materials } from "../Materials";
+import { Material } from "../../Materials";
 import SimulationDescription from "./SimulationDescription";
-import { AxisDirections, CardinalDirections } from "../Vector";
+import { AxisDirections, CardinalDirections } from "../../Vector";
 
 abstract class BaseReactorSimulation {
     x: number;
@@ -189,7 +189,7 @@ abstract class BaseReactorSimulation {
         } else {
             this.fuelTank.burn(0);
         }
-        
+
         // decay fertility, RadiationHelper.tick in old BR, this is copied, mostly
         let denominator = Config.Reactor.FuelFertilityDecayDenominator;
         if (!active) {

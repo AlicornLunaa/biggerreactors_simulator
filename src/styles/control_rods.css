@@ -1,4 +1,4 @@
-.controlRodPanel {
+.control-rod-status {
     background-color: var(--greenMuted);
     color: var(--foregroundColor);
     font-size: 1.258rem;
@@ -8,8 +8,15 @@
     margin-top: 1.618rem;
 }
 
-.titleBar {
+.rod-title {
     padding: 1em;
+    display: flex;
+}
+.lock-option {
+    padding: 1em;
+    display: flex;
+    flex-grow: 100;
+    justify-content: right;
 }
 
 .break {
@@ -25,8 +32,17 @@
     border-radius: 0px 0px 0px 5px;
     width: calc(100% - 1.618em);
 }
-
+.rods input {
+    width: calc(100% - 1.618em);
+}
 .rods p {
     padding: 0px;
     margin: 0px;
+}
+
+.control-rod-slider {
+    display: flex;
+}
+.control-rod-slider span {
+    width: 14rem;
 }

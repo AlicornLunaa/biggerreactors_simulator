@@ -1,13 +1,14 @@
-.controlPanel {
+.reactor-status {
     background-color: var(--greenMuted);
     color: var(--foregroundColor);
     font-size: 1.258rem;
     display: flex;
     flex-flow: wrap;
     border-radius: 5px;
+    margin-top: 1.618rem;
 }
 
-.titleBar {
+.reactor-title {
     padding: 1em;
 }
 
@@ -15,7 +16,7 @@
     width: 100%;
 }
 
-.left {
+.status-left {
     background-color: #dae1d8;
     color: var(--textColor);
     font-size: 1rem;
@@ -25,7 +26,7 @@
     border-radius: 0px 0px 0px 5px;
 }
 
-.right {
+.status-right {
     background-color: #ccd4ca;
     color: var(--textColor);
     font-size: 1rem;
@@ -39,4 +40,19 @@
     background-color: #ff0000;
     width: calc(50% - 35%);
     position: relative;
+}
+#fuel-bar {
+    background-color: #66CC00;
+}
+#waste-bar {
+    background-color: #00C8CC;
+}
+#case-heat-bar {
+    background-color: #CC6600;
+}
+#fuel-heat-bar {
+    background-color: #CC6600;
+}
+#battery-bar {
+    background-color: #CC2800;
 }

@@ -1,4 +1,4 @@
-import { Vector3 } from "../Vector";
+import { Vector3 } from "../../Vector";
 import Config from "./Config";
 
 class RayStep {
@@ -108,7 +108,7 @@ class RayStep {
             segmentLength = Math.min(totalLength - processedLength, segmentLength);
 
             if(Number.isNaN(segmentLength)){
-                let a;
+                // let a;
             }
             
             if (!firstIteration && segmentLength != 0) {

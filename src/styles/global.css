@@ -1,0 +1,234 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  --foregroundColor: #F0F4EF;
+  --textColor: #131415;
+  --activeColor: #E05263;
+  --greenMuted: #6F9283;
+  --greenBright: #77ffdf;
+
+  color-scheme: light;
+  color: var(--textColor);
+  background-color: var(--foregroundColor);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0rem 2rem;
+  text-align: center;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 0 0 0.4rem 0.4rem;
+  background-color: var(--greenBright);
+}
+
+.logo-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+.logo {
+  height: 3em;
+  margin-right: 1rem;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.title {
+  font-size: 1.618rem;
+}
+
+.actions {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+}
+.actions button,
+.actions a {
+  border-radius: 8px;
+  border: 1px solid black;
+  padding: 18px;
+  margin: 0px 3px;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  text-decoration: none;
+  color: black;
+  background-color: #EFEFEF;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+.actions button:hover,
+.actions a:hover {
+  background-color: #E5E5E5;
+  color: black;
+}
+.actions button:active,
+.actions a:active {
+  background-color: #F5F5F5;
+  color: black;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  padding-top: 120px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: #000000;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 40%;
+}
+
+#reactor-setup {
+  min-width: 320px;
+  width: 40%;
+  padding: 2px 1rem;
+  border-radius: 10px;
+}
+#reactor-setup p {
+  display: flex;
+  justify-content: center;
+  font-size: 1.618rem;
+}
+#reactor-setup input,
+#reactor-setup select {
+  width: 98%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  font-weight: 400;
+  font-family: inherit;
+  text-decoration: none;
+}
+#reactor-setup button {
+  border-radius: 8px;
+  border: 1px solid black;
+  padding: 1rem;
+  margin: 0.2rem;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  text-decoration: none;
+  color: black;
+  background-color: #EFEFEF;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+.labeled-field {
+  display: flex;
+  justify-content: space-between;
+}
+.labeled-field span {
+  float: left;
+  padding-right: 1rem;
+}
+
+.grid {
+  margin: 0 auto;
+  display: grid;
+  gap: 0.618rem;
+  grid-template-columns: 1fr;
+}
+.grid-element {
+  padding: 0;
+}
+@media (min-width: 900px) {
+  .grid { grid-template-columns: 0.3fr 1fr; }
+}
+
+.reactor-designer {
+  margin-top: 10px;
+}
+
+.material-list button {
+  width: 100%;
+}
+.material-list button:hover {
+  background-color: #a0dacc;
+}
+.selected-element-btn {
+  background-color: #bdf1e5;
+}
+
+#reactor-canvas {
+  width: 100%;
+  aspect-ratio: 1;
+}
+#reactor-size-lbl {
+  margin: 0;
+}
+
+a {
+  font-weight: 500;
+  color: #6F9283;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #77FF94;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 4px;
+  border: 1px solid black;
+  padding: 10px;
+  margin: 0px 3px;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  text-decoration: none;
+  color: black;
+  background-color: #EFEFEF;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+  background-color: #E5E5E5;
+  color: black;
+}
+button:active {
+  background-color: #d8d8d87c;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}

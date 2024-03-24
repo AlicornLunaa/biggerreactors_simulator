@@ -1,7 +1,7 @@
 // https://github.com/BiggerSeries/BiggerReactors/blob/master/src/main/java/net/roguelogix/biggerreactors/multiblocks/reactor/simulation/base/CoolantTank.java
 import Config from "./Config";
 import HeatBody from "./HeatBody";
-import { Material } from "../Materials";
+import { Material } from "../../Materials";
 import { TransitionFluid } from "./TransitionFluid";
 
 class CoolantTank extends HeatBody {

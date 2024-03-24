@@ -1,7 +1,7 @@
 {
-  "name": "biggerreactors_simulator",
+  "name": "extremereactors_simulator",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "homepage": "https://alicornlunaa.github.io/biggerreactors_simulator",
   "scripts": {
@@ -11,20 +11,11 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
-  "dependencies": {
-    "@emotion/react": "^11.10.6",
-    "@emotion/styled": "^11.10.6",
-    "@mui/material": "^5.11.9",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.8.1"
-  },
   "devDependencies": {
-    "@types/react": "^18.0.27",
-    "@types/react-dom": "^18.0.10",
-    "@vitejs/plugin-react": "^3.1.0",
-    "gh-pages": "^5.0.0",
-    "typescript": "^4.9.3",
-    "vite": "^4.1.0"
+    "gh-pages": "^6.1.1",
+    "path": "^0.12.7",
+    "typescript": "^5.2.2",
+    "url": "^0.11.3",
+    "vite": "^5.1.6"
   }
 }
