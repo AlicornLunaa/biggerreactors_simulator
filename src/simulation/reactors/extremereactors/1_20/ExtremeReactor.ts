@@ -1,22 +1,12 @@
 import { Material } from "../../../Materials";
 import { Vector3 } from "../../../Vector";
 import { Config } from "./Config";
+import { ControlRod } from "./ControlRod";
 import EnergyConversion from "./EnergyConversion";
 import { FuelProperties } from "./FuelProperties";
 import { FuelRodMap } from "./FuelRodMap";
 import { IrradiationSource } from "./IrradiationSource";
 import { Variant } from "./Variant";
-
-export class ControlRod {
-    x: number;
-    z: number;
-    insertion: number = 0;
-
-    constructor(x: number, z: number) {
-        this.x = x;
-        this.z = z;
-    }
-};
 
 class IrradiationData {
     fuelUsage: number = 0;
@@ -58,7 +48,7 @@ export default class ExtremeReactor implements ReactorInterface {
     private reactorHeat = 0;
     private coolantTemp = 0;
 
-    private fuelCapacity = 100000;
+    private fuelCapacity = 11048;
     private fuelAmount = 0;
     private wasteAmount = 0;
     private fuelHeat = 0;
@@ -81,22 +71,22 @@ export default class ExtremeReactor implements ReactorInterface {
         for(let x = 0; x < width; x++){
             let slice: Material[][] = [];
 
-            for(let z = 0; z < depth; z++){
+            for(let y = 0; y < height; y++){
                 let column: Material[] = [];
 
-                for(let y = 0; y < height; y++){
+                for(let z = 0; z < depth; z++){
                     column.push(Material.EMPTY_MODERATOR);
                 }
-                
+
                 slice.push(column);
             }
-
+            
             this.blocks.push(slice);
         }
 
         this.reactorToCoolantSystemHeatTransferCoefficient = 0.6 * this.internalSurfaceArea();
         this.reactorHeatLossCoefficient = 0.001 * this.externalSurfaceArea();
-
+        this.set_fertility(1);
     }
 
     // Functions
@@ -131,7 +121,12 @@ export default class ExtremeReactor implements ReactorInterface {
     }
 
     public update_fuel_rods(){
-        this.fuelToReactorHeatTransferCoefficient = this.fuelRods.get_heat_transfer_rate(this.blocks); // Incorrect value
+        this.fuelToReactorHeatTransferCoefficient = this.fuelRods.get_heat_transfer_rate(this.blocks);
+        this.fuelCapacity = this.fuelRods.size() * 4000;
+        
+        let outerVolume = (this.width + 2) * (this.depth + 2) * (this.height + 2) - this.getReactorVolume();
+        let partCount = outerVolume + this.fuelRods.size();
+        this.energyCapacity = this.variant.partEnergyCapacity * partCount;
     }
 
     private internalSurfaceArea(){
@@ -146,7 +141,7 @@ export default class ExtremeReactor implements ReactorInterface {
         if(!active)
             return;
 
-        let source = this.fuelRods.get_next(this.width);
+        let source = this.fuelRods.get_next(this.height);
 
         if(source){
             this.performIrradiationFrom(source);
@@ -157,7 +152,7 @@ export default class ExtremeReactor implements ReactorInterface {
         let res = this.radiate(source, this.fuelHeat, this.get_control_rod_count());
 
         if(res){
-            this.fuelHeat += res.getFuelHeatChange(this.get_control_rod_count());
+            this.fuelHeat += res.getFuelHeatChange(this.fuelRods.size());
             this.reactorHeat += res.getEnvironmentHeatChange(this.getReactorVolume());
             this.fuelUsedLastTick = res.fuelUsage;
         }
@@ -207,7 +202,7 @@ export default class ExtremeReactor implements ReactorInterface {
         this.generatedLastTick = rawEnergy;
     }
 
-    private moderateRadiation(source: IrradiationSource, irradiationData: IrradiationData, radiation: RadiationPacket) {
+    private moderateRadiationForFuelRod(source: IrradiationSource, irradiationData: IrradiationData, radiation: RadiationPacket) {
         if (!source.linked) {
             return;
         }
@@ -228,6 +223,13 @@ export default class ExtremeReactor implements ReactorInterface {
 
         irradiationData.fuelEnergyAbsorption += radiationAbsorbed * EnergyConversion.ENERGY_PER_RADIATION_UNIT;
         irradiationData.fuelAbsorbedRadiation += fertilityAbsorbed;
+    }
+
+    private moderateRadiation(moderator: Material, data: IrradiationData, radiation: RadiationPacket) {
+        let radiationAbsorbed = radiation.intensity * moderator.absorption * (1 - radiation.hardness);
+        radiation.intensity = Math.max(0, radiation.intensity - radiationAbsorbed);
+        radiation.hardness /= moderator.moderation;
+        data.environmentEnergyAbsorption += moderator.efficiency * radiationAbsorbed * EnergyConversion.ENERGY_PER_RADIATION_UNIT;
     }
 
     public onIrradiation(fuelUsed: number) {
@@ -289,7 +291,21 @@ export default class ExtremeReactor implements ReactorInterface {
             while (ttl > 0 && radPacket.intensity > 0.0001) {
                 ttl--;
                 currentCoord.add(dir.x, dir.y, dir.z);
-                this.moderateRadiation(source, data, radPacket);
+
+                if(currentCoord.x < 0 || currentCoord.y < 0 || currentCoord.z < 0 || currentCoord.x >= this.width || currentCoord.y >= this.height || currentCoord.z >= this.depth){
+                    radPacket.intensity = 0;
+                    continue;
+                }
+
+                let blockAtCurrentCoord = this.blocks[currentCoord.x][currentCoord.y][currentCoord.z];
+                
+                if(!blockAtCurrentCoord){
+                    radPacket.intensity = 0;
+                } else if(blockAtCurrentCoord.id == "biggerreactors:fuel_rod"){
+                    this.moderateRadiationForFuelRod(source, data, radPacket);
+                } else {
+                    this.moderateRadiation(blockAtCurrentCoord, data, radPacket);
+                }
             }
         }
 
@@ -334,6 +350,14 @@ export default class ExtremeReactor implements ReactorInterface {
         }
     }
 
+    private set_fertility(value: number){
+        if(!isFinite(value) || isNaN(value)){
+            this.fertility = 1;
+        } else {
+            this.fertility = Math.max(this.fertility, 0);
+        }
+    }
+
     // Interface
     tick(active: boolean): void {
         this.performIrradiation(active);
@@ -345,6 +369,10 @@ export default class ExtremeReactor implements ReactorInterface {
 
         this.reactorHeat = Math.max(this.reactorHeat, 0);
         this.fuelHeat = Math.max(this.fuelHeat, 0);
+
+        if(!active){
+            this.fuelUsedLastTick = 0;
+        }
     }
 
     refuel(): void {
@@ -367,7 +395,15 @@ export default class ExtremeReactor implements ReactorInterface {
     get_fuel(): number { return this.fuelAmount; }
     get_fuel_capacity(): number { return this.fuelCapacity; }
     get_waste(): number { return this.wasteAmount; }
-    get_fertility(): number { return this.fertility; }
+
+    get_fertility(): number {
+        // Extreme reactors uses diff method
+        if (this.fuelAmount + this.wasteAmount <= 0) {
+            return 0;
+        } else {
+            return this.fuelAmount / (this.fuelAmount + this.wasteAmount);
+        }
+    }
 
     set_control_rod(index: number, insertion: number): void { this.controlRods[index].insertion = insertion; }
     get_control_rod(index: number): number { return this.controlRods[index].insertion; }
