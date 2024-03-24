@@ -96,6 +96,7 @@ export default class ExtremeReactor implements ReactorInterface {
 
         this.reactorToCoolantSystemHeatTransferCoefficient = 0.6 * this.internalSurfaceArea();
         this.reactorHeatLossCoefficient = 0.001 * this.externalSurfaceArea();
+
     }
 
     // Functions
@@ -111,8 +112,6 @@ export default class ExtremeReactor implements ReactorInterface {
                     break;
                 }
             }
-
-            this.update_fuel_rods();
         }
     }
 
@@ -131,8 +130,8 @@ export default class ExtremeReactor implements ReactorInterface {
         }
     }
 
-    private update_fuel_rods(){
-        this.fuelToReactorHeatTransferCoefficient = this.fuelRods.get_heat_transfer_rate(this.blocks);
+    public update_fuel_rods(){
+        this.fuelToReactorHeatTransferCoefficient = this.fuelRods.get_heat_transfer_rate(this.blocks); // Incorrect value
     }
 
     private internalSurfaceArea(){

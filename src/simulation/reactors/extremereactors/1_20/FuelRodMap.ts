@@ -40,13 +40,13 @@ export class FuelRodMap {
 
             for (let dir of rod.irradiationDirections) {
                 let targetPosition = new Vector3(rodPosition.x + dir.x, rodPosition.y + dir.y, rodPosition.z + dir.z);
-
+                
                 // Edge-case for casings
                 if (targetPosition.x < 0 || targetPosition.y < 0 || targetPosition.z < 0 || targetPosition.x >= world.length || targetPosition.y >= world[0].length || targetPosition.z >= world[0][0].length) {
                     heatTransferRate += 0.6;
                     continue;
                 }
-
+                
                 let state = world[targetPosition.x][targetPosition.y][targetPosition.z];
 
                 if (state.id == "minecraft:air") {
