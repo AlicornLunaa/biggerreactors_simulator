@@ -1,5 +1,5 @@
-import { Material } from "../../../Materials";
-import { Vector3 } from "../../../Vector";
+import { Material } from "../../Materials";
+import { Vector3 } from "../../Vector";
 import { Config } from "./Config";
 import { ControlRod } from "./ControlRod";
 import EnergyConversion from "./EnergyConversion";
@@ -372,6 +372,10 @@ export default class ExtremeReactor implements ReactorInterface {
 
         if(!active){
             this.fuelUsedLastTick = 0;
+        }
+
+        if(this.storedEnergy > this.energyCapacity){
+            this.storedEnergy = this.energyCapacity;
         }
     }
 

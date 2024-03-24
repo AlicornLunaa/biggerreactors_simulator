@@ -1,7 +1,7 @@
 import { Material, Materials } from "./Materials";
-import SimulationDescription from "./reactors/biggerreactors/1_19/SimulationDescription";
-import TimeSlicedReactorSimulation from "./reactors/biggerreactors/1_19/TimeSlicedReactorSimulation";
-import ExtremeReactor from "./reactors/extremereactors/1_20/ExtremeReactor";
+import SimulationDescription from "./reactors/biggerreactors/SimulationDescription";
+import TimeSlicedReactorSimulation from "./reactors/biggerreactors/TimeSlicedReactorSimulation";
+import ExtremeReactor from "./reactors/extremereactors/ExtremeReactor";
 
 /**
  * This is a generic class defining a reactor, agnostic to game version.
@@ -52,7 +52,7 @@ export default class GenericReactor {
     }
 
     public get_simulation(): ReactorInterface {
-        if(this.version == "extremereactors_1.20"){
+        if(this.version == "extremereactors"){
             let reactor = new ExtremeReactor(this.width, this.depth, this.height);
 
             for(let x = 0; x < this.width; x++){

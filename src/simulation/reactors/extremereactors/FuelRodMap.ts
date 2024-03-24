@@ -1,5 +1,5 @@
-import { Material } from "../../../Materials";
-import { Vector3 } from "../../../Vector";
+import { Material } from "../../Materials";
+import { Vector3 } from "../../Vector";
 import { IrradiationSource } from "./IrradiationSource";
 
 export class FuelRodMap {

@@ -146,8 +146,8 @@ const setup_simulation = () => {
           sliderList.forEach((element, key) => {
             if(key == i) return;
             let otherSlider = element.querySelector<HTMLInputElement>("input")!;
-            set_rod(key, otherSlider, element.querySelector<HTMLSpanElement>("span")!);
             otherSlider.value = slider.value;
+            set_rod(key, otherSlider, element.querySelector<HTMLSpanElement>("span")!);
           });
         }
       });

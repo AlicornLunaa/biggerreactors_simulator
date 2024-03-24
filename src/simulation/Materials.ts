@@ -20,7 +20,7 @@ class Material {
 }
 
 const Materials: { [ver: string]: { [id: string] : Material } } = {
-    "extremereactors_1.20": {
+    "extremereactors": {
         "biggerreactors:fuel_rod": Material.FUEL_ROD,
         "minecraft:air": new Material("minecraft:air", "Air", 0.1, 0.25, 1.1, 0.05),
         "forge:storage_block/apatite": new Material("forge:storage_block/apatite", "Apatite", 0.48, 0.73, 1.30, 0.15),
@@ -81,7 +81,7 @@ const Materials: { [ver: string]: { [id: string] : Material } } = {
         "thermal:redstone": new Material("thermal:redstone", "Redstone", 0.77, 0.56, 1.61, 2.5),
         "thermal:redstone_flowing": new Material("thermal:redstone_flowing", "Redstone Flowing", 0.75, 0.55, 1.60, 2.5)
     },
-    "biggerreactors_1.19": {
+    "biggerreactors": {
         "biggerreactors:fuel_rod": Material.FUEL_ROD,
         "biggerreactors:ludicrite_block": new Material("biggerreactors:ludicrite_block", "Ludicrite Block", 0.6, 0.87, 3, 3),
         "bloodmagic:life_essence_block": new Material("bloodmagic:life_essence_block", "Life Essence Block", 0.7, 0.55, 1.75, 2.5),
